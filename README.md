@@ -1,12 +1,15 @@
+# Distributed Sharit
+Sharit Website still running @ http://sharit.warloncs.net
+Website will get updated over the semester.
+
+## Overview
+Distributed Sharit follows a new roadmap architecture to secure no single point of failure in the distributed system. Currently, there are plans to expand nginx webservers, frontend webservers, REST API endpoints, caching using memcached, databases using redis or apache cassandra, and filesystem using hadoop file system, amazon S3, or CDN of a sort. 
+
+Android development will come soon.
+
+- - - -
+
 # Project Sharit
-Sharit Website
-
-*Updated 12/7/2016*
-
-http://ec2-52-91-21-93.compute-1.amazonaws.com
-
-52.91.21.93
-
 ## Overview
 Sharit is a website developed to share information between users of established organizations. Main features supported are file sharing with threads, comments for users to communicate with one another. This website is built on NodeJS for front and back end, postgreSQL for db, and templating + jQuery bootstrapping for frontend responsiveness.
 
