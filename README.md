@@ -1,6 +1,10 @@
 # Distributed Sharit
 Sharit Website still running @ http://sharit.warloncs.net
+
 Website will get updated over the semester.
+
+* Google drive Link
+ * https://drive.google.com/open?id=0B8SEHfpAjaYCYXlfWkdCUWZxZGc
 
 ## Overview
 Distributed Sharit follows a new roadmap architecture to secure no single point of failure in the distributed system. Currently, there are plans to expand nginx webservers, frontend webservers, REST API endpoints, caching using memcached, databases using redis or apache cassandra, and filesystem using hadoop file system, amazon S3, or CDN of a sort. 
