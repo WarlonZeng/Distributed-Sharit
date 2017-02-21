@@ -30,18 +30,19 @@ router.get('/', function(req, res) {
 	'FROM (permissions.subdomain_user natural join posts.thread natural join posts.file) join domains.subdomain on(thread.subdomain_id = subdomain.id) WHERE username = $1 ORDER BY points DESC, date_posted DESC';
 	var findSubUserNotIn = 'select id, name from domains.subdomain where id not in'+
 '		(select subdomain_id from permissions.subdomain_user where username=$1) order by name;';
+
 	if(user){
 		pool.connect(function(err, client, done){
 			client.query(findAllThreads, [user], function(err, result){
 				client.query(findSubUserNotIn, [user], function(err, subs){
 					done();
-					res.render('initial', {nav: req.session[user].nav, subnav: req.session[user].subnav, logged: false, user: user, threads: result.rows, subs: subs.rows});
+					res.render('initial', {nav: req.session[user].nav, subnav: req.session[user].subnav, logged: true, user: user, threads: result.rows, subs: subs.rows});
 				})
 			});
 		});
 		//res.render('initial', {nav: req.session[user].nav, subnav: req.session[user].subnav, logged: false, user: user});
 	}else{
-		res.render('initial', {logged: true});
+		res.render('initial', {logged: false});
 	}
 });
 
@@ -151,17 +152,17 @@ router.get('/NYU/:sub/:subid/:user', function(req, res){
 
 // 2 user params: newPassword, username
 // successfully updates password w/ new hash
-router.post('/updatePassword', function(req, res){
-	var updatePassword = 'UPDATE users.user SET password = $1 WHERE username = $2';
-	var salt =  bcrypt.genSaltSync(10);
-	var hash = bcrypt.hashSync(req.body.newPassword, salt);
-	pool.connect(function(err, client, done){
-		client.query(updatePassword, [hash, req.body.username], function(err, result){
-			done();
-			res.json(result.rows);
-		});
-	});
-});
+// router.post('/updatePassword', function(req, res){
+// 	var updatePassword = 'UPDATE users.user SET password = $1 WHERE username = $2';
+// 	var salt =  bcrypt.genSaltSync(10);
+// 	var hash = bcrypt.hashSync(req.body.newPassword, salt);
+// 	pool.connect(function(err, client, done){
+// 		client.query(updatePassword, [hash, req.body.username], function(err, result){
+// 			done();
+// 			res.json(result.rows);
+// 		});
+// 	});
+// });
 
 router.get('/logout/:user', function(req, res){
 	delete req.session[req.params.user];
@@ -219,17 +220,17 @@ router.get('/logout/:user', function(req, res){
 
 // 1 user param: username
 // get all user's comment ever posted
-router.post('/getCommentPosted', function(req, res){
-	var userComments = 'SELECT * from posts.comment JOIN posts.thread ON(author = $1)';
-	console.log(req.body);
+// router.post('/getCommentPosted', function(req, res){
+// 	var userComments = 'SELECT * from posts.comment JOIN posts.thread ON(author = $1)';
+// 	console.log(req.body);
 
-	pool.connect(function(err, client, done){
-		client.query(userComments, [req.body.username], function(err, result){
-			console.log(result.rows);
-			done();
-			res.json(result.rows);
-		});
-	});
-});
+// 	pool.connect(function(err, client, done){
+// 		client.query(userComments, [req.body.username], function(err, result){
+// 			console.log(result.rows);
+// 			done();
+// 			res.json(result.rows);
+// 		});
+// 	});
+// });
 
 module.exports = router;
