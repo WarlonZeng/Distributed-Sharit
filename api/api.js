@@ -26,7 +26,7 @@ function getPoints(client, id, res, done, query){
 	})
 }
 
-// Index
+// Index - Default information
 router.get('/', function(req, res) { // use req.session 
 	var user = req.query.username;
 	var findAllThreads = 'SELECT subdomain_id, username, thread.id, author, date_posted, title, context, points, name, filename ' + 'FROM (permissions.subdomain_user NATURAL JOIN posts.thread natural JOIN posts.file) JOIN domains.subdomain on(thread.subdomain_id = subdomain.id) WHERE username = $1 ORDER BY points DESC, date_posted DESC';
@@ -52,11 +52,31 @@ router.get('/', function(req, res) { // use req.session
 		consle.log("no login");
 		pool.connect(function (err, client, done) {
 			client.query(getAllThreads, function (err, result) {
-				done(); 
+				done();
 				res.json();
 			});
 		});
 	}
+});
+
+// Subdomain: Get threads of selected subdomain
+router.get('/api/v1.0/NYU/:sub/:subid/:user', function(req, res){ // /api/NYU/CS/3/wz634
+	if(! req.session.hasOwnProperty(req.params.user)){
+		res.redirect('/');
+		return;
+	}
+
+	var findThreads = 'SELECT subdomain_id, thread.id, author, date_posted, title, context, points, filename from posts.thread JOIN posts.file ON(thread.id = file.thread_id) WHERE subdomain_id = $1 ORDER BY points DESC';
+	pool.connect(function(err, client, done){
+		client.query(findThreads, [req.params.subid], function(err, result){
+			done();
+			var user = req.params.user;
+			//res.render('index', {threads: result.rows, nav: req.session[user].nav, subnav: req.session[user].subnav, user: user, subid: req.params.subid, sub: req.params.sub});
+			res.json();
+			return;
+		});
+	});
+	res.json(false);
 });
 
 // Subdomain: Create subdomain
@@ -83,26 +103,6 @@ router.post('api/v1.0/NYU/:user/createSub', function(req, res){
 		})
 	});
 
-	res.json(false);
-});
-
-// Subdomain: Get threads of selected subdomain
-router.get('/api/v1.0/NYU/:sub/:subid/:user', function(req, res){ // /api/NYU/CS/3/wz634
-	if(! req.session.hasOwnProperty(req.params.user)){
-		res.redirect('/');
-		return;
-	}
-
-	var findThreads = 'SELECT subdomain_id, thread.id, author, date_posted, title, context, points, filename from posts.thread JOIN posts.file ON(thread.id = file.thread_id) WHERE subdomain_id = $1 ORDER BY points DESC';
-	pool.connect(function(err, client, done){
-		client.query(findThreads, [req.params.subid], function(err, result){
-			done();
-			var user = req.params.user;
-			//res.render('index', {threads: result.rows, nav: req.session[user].nav, subnav: req.session[user].subnav, user: user, subid: req.params.subid, sub: req.params.sub});
-			res.json();
-			return;
-		});
-	});
 	res.json(false);
 });
 
@@ -173,7 +173,8 @@ router.get('/NYU/:sub/:subid/:user/:thread_id', function(req, res){
 		client.query(threads, [req.params.thread_id], function(err, thread){
 			client.query(comments, [req.params.thread_id], function(err, comments){
 				client.query(file, [req.params.thread_id], function(err, filename){
-					res.render('threadContent', {thread: thread.rows[0], comments: comments.rows, filename: filename.rows[0], nav: req.session[user].nav, subnav: req.session[user].subnav, user: user, subid: req.params.subid, sub: req.params.sub, thread_id: req.params.thread_id})
+					//res.render('threadContent', {thread: thread.rows[0], comments: comments.rows, filename: filename.rows[0], nav: req.session[user].nav, subnav: req.session[user].subnav, user: user, subid: req.params.subid, sub: req.params.sub, thread_id: req.params.thread_id})
+					res.json();
 				});	
 			});
 		});
