@@ -153,4 +153,19 @@ Caching will be from Redis.
 File system will be a CDN of some sort. Currently looking into available options and files will no longer be stored into the production database.
 
 
-Wrote API to send json object instead of rendering a webpage. 
+### 3/10/17
+Wrote API to send json object instead of rendering a webpage. Need to swap for cassandra or mysql connector - postgres not that good.
+
+### 3/20/17
+Settling on cassandra. 1 cluster, 1 data center, 1 rack, 3 servers, 1 node each. In terminology, cluster and data center are somewhat synonymous, but the hierarchy generally looks like this:
+```git
+cluster
+    data center
+        racks
+            servers
+                nodes
+```
+A cluster holds many data centers and can replicate through all of them. Think of a cluster like a continent or country; i.e., USA.
+The data centers would be the west and east coasts. So far I only set up for each coast.
+Each data center can hold many racks. I only have one rack and it holds 3 servers. Rack may or may not incur a likely point of failure, the real point of redundancy is the servers.
+3 servers. 1 node each. This allows for horizontal replication to have multiple copies of the dataset across commodity machines.
