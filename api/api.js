@@ -61,7 +61,7 @@ router.get('/', function(req, res) { // use req.session
 
 // Subdomain: Get threads of selected subdomain
 router.get('/api/v1.0/NYU/:sub/:subid/:user', function(req, res){ // /api/NYU/CS/3/wz634
-	if(! req.session.hasOwnProperty(req.params.user)){
+	if(!req.session.hasOwnProperty(req.params.user)){
 		res.redirect('/');
 		return;
 	}

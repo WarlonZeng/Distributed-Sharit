@@ -1,35 +1,19 @@
 {
   "name": "sharit",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Distributed Sharit project",
+  "main": "app.js",
   "scripts": {
-    "start": "node ./bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rasagle/Sharit.git"
+    "url": "git+https://github.com/WarlonZeng/Distributed-Sharit.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Warlon Zeng",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rasagle/Sharit/issues"
+    "url": "https://github.com/WarlonZeng/Distributed-Sharit/issues"
   },
-  "homepage": "https://github.com/rasagle/Sharit#readme",
-  "dependencies": {
-    "bcryptjs": "^2.3.0",
-    "body-parser": "^1.15.2",
-    "cookie-parser": "^1.0.0",
-    "ejs": "^2.5.2",
-    "express": "^4.14.0",
-    "express-session": "^1.14.2",
-    "hbs": "^4.0.1",
-    "morgan": "^1.0.0",
-    "multer": "^1.2.0",
-    "pg": "^6.1.0"
-  },
-  "devDependencies": {
-    "nodemon": "^1.11.0"
-  }
+  "homepage": "https://github.com/WarlonZeng/Distributed-Sharit#readme"
 }
