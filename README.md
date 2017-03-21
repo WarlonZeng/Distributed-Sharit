@@ -68,7 +68,7 @@ cqlsh
 ### Cassandra configuration:
 Replace config files:
 ```git
-sudo cp -f /home/ubuntu/GitHub/Distributed-Sharit/database/cassandra.yaml /etc/cassandra
+sudo cp -f /home/ubuntu/GitHub/Distributed-Sharit/database/cassandra/cassandra.yaml /etc/cassandra
 ```
 
 ### Nginx Configuration:
