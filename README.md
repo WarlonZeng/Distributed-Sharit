@@ -45,7 +45,7 @@ sudo n stable
 sudo n latest
 ```
 
-### Install Cassandra
+### Install Cassandra:
 Download cassandra from datastax:
 ```git
 echo "deb http://www.apache.org/dist/cassandra/debian 310x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
@@ -63,6 +63,12 @@ sudo nodetool status
 Use CQLSH (Cassandra query language shell):
 ```git
 cqlsh
+```
+
+### Cassandra configuration:
+Replace config files:
+```git
+sudo cp -f /home/ubuntu/GitHub/Distributed-Sharit/database/cassandra.yaml /etc/cassandra
 ```
 
 ### Nginx Configuration:
