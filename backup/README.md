@@ -15,7 +15,7 @@ Distributed Sharit follows a new roadmap architecture to provide high availabili
 * CSS3
 * NodeJS
 * Redis
-* MySQL + MySQL replication + MySQL auto-failover
+* Cassandra
 
 ## Techniques/Concepts involved
 * Horizontal replication of database (peer-to-peer selection factor)
@@ -43,6 +43,32 @@ sudo npm cache clean -f
 sudo npm install -g n
 sudo n stable
 sudo n latest
+```
+
+### Install Cassandra:
+Download cassandra from datastax:
+```git
+echo "deb http://www.apache.org/dist/cassandra/debian 310x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
+curl https://www.apache.org/dist/cassandra/KEYS | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install cassandra
+```
+
+Check if Cassandra is working:
+```git
+sudo service cassandra status
+sudo nodetool status
+```
+
+Use CQLSH (Cassandra query language shell):
+```git
+cqlsh
+```
+
+### Cassandra configuration:
+Replace config files:
+```git
+sudo cp -f /home/ubuntu/GitHub/Distributed-Sharit/database/cassandra/cassandra.yaml /etc/cassandra
 ```
 
 ### Nginx Configuration:
@@ -105,28 +131,6 @@ sudo npm install -g npm-check-updates
 sudo ncu -u
 sudo npm install -g express@latest
 ```
-
-### MySQL Master-Slave replication:
-Edit configuration files
-```git
-sudo vi /etc/mysql/mysqld.conf.d/mysqld.cnf
-
-server-id               = 1
-log_bin                 = /var/log/mysql/mysql-bin.log
-expire_logs_days        = 10
-max_binlog_size         = 100M
-binlog_do_db            = sharit
-
-bind-address            = 172.31.63.231/172.31.52.138/172.31.52.220
-
-sudo service mysql restart
-```
-```git
-sudo service mysql restart
-mysql -u root -p
-```
-```git
-GRANT REPLICATION SLAVE ON *.* TO 'slave_user'@'%' IDENTIFIED BY 'password';
 
 ### Git Protocols:
 To replace all your local files (including edits) with remote repo:
