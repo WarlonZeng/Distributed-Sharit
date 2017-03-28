@@ -111,22 +111,35 @@ Edit configuration files
 ```git
 sudo vi /etc/mysql/mysqld.conf.d/mysqld.cnf
 
-server-id               = 1
+server-id               = 1/2/3
 log_bin                 = /var/log/mysql/mysql-bin.log
 expire_logs_days        = 10
 max_binlog_size         = 100M
-binlog_do_db            = sharit
 
 bind-address            = 172.31.63.231/172.31.52.138/172.31.52.220
+```
+```git
+GRANT REPLICATION SLAVE ON *.* TO 'slave_user'@'%' IDENTIFIED BY 'slave_password';
 
-sudo service mysql restart
+(create database, table, and insert some data)
+
+mysqldump -uroot --all-databases -p --master-data > sharit.sql
 ```
 ```git
-sudo service mysql restart
-mysql -u root -p
+change master to master_host='172.31.63.231', master_user='slave_user', master_password='slave_password';
+show slave status\G;
+mysql -u root -p < sharit.sql
+show slave status\G;
 ```
+
 ```git
-GRANT REPLICATION SLAVE ON *.* TO 'slave_user'@'%' IDENTIFIED BY 'password';
+start slave;
+stop slave;
+show master status; // show current machine mysql server's binary log position
+show slave status\G; // check if slave read up to master
+show slave hosts; // check slave followers to host
+```
+
 
 ### Git Protocols:
 To replace all your local files (including edits) with remote repo:
