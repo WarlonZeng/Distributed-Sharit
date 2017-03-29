@@ -19,6 +19,8 @@ Array.prototype.forEach.call(downVoteThread, function(ele){
 	ele.addEventListener('click', handleDownThread);
 });
 
+console.log("js pinged");
+
 function handleUpCom(evt){
 	var url = evt.srcElement.attributes.info.nodeValue;
 	sendAJAX(url, evt, 'up');
@@ -78,7 +80,8 @@ function sendAJAX(url, evt, direction){
 		var output = JSON.parse(this.responseText);
 		if(direction === 'up'){
 			evt.srcElement.nextSibling.nextSibling.nextSibling.textContent = output.points;
-		}else{
+		}
+		else{
 			evt.srcElement.previousSibling.previousSibling.previousSibling.textContent = output.points;
 		}
 	})

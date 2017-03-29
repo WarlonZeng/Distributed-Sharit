@@ -8,9 +8,9 @@ var session = require('express-session');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
+var subDom = require('./routes/subDom');
 var thread = require('./routes/thread');
 var comment = require('./routes/comment');
-var subDom = require('./routes/subDom');
 
 var app = express();
 
@@ -34,10 +34,10 @@ var sessionOptions = {
 app.use(session(sessionOptions));
 
 app.use('/', index);
+app.use('/users', users);
+app.use('/', subDom);
 app.use('/', thread);
 app.use('/', comment);
-app.use('/', subDom);
-app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
