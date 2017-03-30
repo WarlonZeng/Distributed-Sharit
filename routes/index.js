@@ -16,12 +16,12 @@ var defaultSub = {
 /* GET home page. */
 router.get('/', function(req, res) {
 	var user = req.query.username;
+	var findAllThreads = 'SELECT subdomain_id, username, thread.id, author, date_posted, title, context, points, name, filename ' +
+	'FROM (subdomain_user natural join thread natural join file) join subdomain on(thread.subdomain_id = subdomain.id) WHERE username = ? ORDER BY points DESC, date_posted DESC';
+	var findSubUserNotIn = 'select id, name from subdomain where id not in' + '(select subdomain_id from subdomain_user where username = ?) order by name;';
 	
 	if (user) {
 		console.log(user);
-		var findAllThreads = 'SELECT subdomain_id, username, thread.id, author, date_posted, title, context, points, name, filename ' + 
-		'FROM (subdomain_user NATURAL JOIN thread NATURAL JOIN file) JOIN subdomain ON (thread.subdomain_id = subdomain.id) WHERE username = ? ORDER BY points DESC, date_posted DESC';
-		var findSubUserNotIn = 'select id, name from subdomain where id not in' + '(select subdomain_id from subdomain_user where username = ?) order by name;';
 
 		pool.getConnection(function(err, client, done) {
 
@@ -37,10 +37,7 @@ router.get('/', function(req, res) {
 	}
 
 	else {
-		var findAllThreads = 'SELECT subdomain_id, username, thread.id, author, date_posted, title, context, points, name, filename ' + 
-		'FROM (subdomain_user NATURAL JOIN thread NATURAL JOIN file) JOIN subdomain ON (thread.subdomain_id = subdomain.id) ORDER BY points DESC, date_posted DESC';
-		var findSubUserNotIn = 'SELECT id, name FROM subdomain ORDER BY name;';
-		//res.render('initial', {logged: false});
+		res.render('initial', {logged: false});
 	}
 });
 

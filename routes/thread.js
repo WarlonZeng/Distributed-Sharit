@@ -11,9 +11,8 @@ var configDB = require('../config/dbconfig.js');
 var pool = new mysql.createPool(configDB);
 
 router.get('/NYU/:sub/:subid/:user/:thread_id', function(req, res) {
-	if(!req.session.hasOwnProperty(req.params.user)){
+	if (!req.session.hasOwnProperty(req.params.user)) {
 		res.redirect('/');
-		return;
 	}
 
 	var user = req.params.user;

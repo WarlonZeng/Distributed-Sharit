@@ -31,6 +31,7 @@ var sessionOptions = {
 	saveUninitialized: false, 
 	resave: false
 }
+
 app.use(session(sessionOptions));
 
 app.use('/', index);
