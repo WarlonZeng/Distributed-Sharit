@@ -207,7 +207,7 @@ Each data center can hold many racks. I only have one rack and it holds 3 server
 ### 4/1/17
 Architecture rescaled to "medium" (primarily SQL). MySQL replication and failover will be primarily used for Distributed Sharit, and between Amazon S3 or Cassandra for file object storage. REST API rebuilt - need to coordinate with Redis session storage to save sessions from outside sources i.e., AJAX and mobile clients. 
 
-======
+---
 
 # Project Sharit (LEGACY README)
 Sharit Website
