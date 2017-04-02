@@ -13,43 +13,77 @@ var defaultSub = {
 	Chem: 4
 }
 
+var ALL_DOMAINS;
+var ALL_SUBDOMAINS;
+var ALL_THREADS;
+
+var FIND_ALL_DOMAINS = 'SELECT name, id FROM domain';
+var FIND_ALL_SUBDOMAINS = 'SELECT name, id FROM subdomain';
+var FIND_ALL_THREADS = 'SELECT * FROM subdomain NATURAL JOIN thread NATURAL JOIN file';
+
+pool.getConnection(function(err, client, done) {
+	client.query(FIND_ALL_DOMAINS, [], function(err, result) {
+		ALL_DOMAINS = result;
+		client.query(FIND_ALL_SUBDOMAINS, [], function(err, result) {
+			ALL_SUBDOMAINS = result;
+			client.query(FIND_ALL_THREADS, [], function(err, result) {
+				client.release();
+				ALL_THREADS = result;
+			});
+		});
+	});
+});
+
+// methods:
+// get homepage
+// get auth
+// get register page
+// post register page
+// get login page
+// post login page
+// get logout?
+
 /* GET home page. */
 router.get('/', function(req, res) {
-	var user = req.query.username;
-	var findAllThreads = 'SELECT subdomain_id, username, thread.id, author, date_posted, title, context, points, name, filename ' +
-	'FROM (subdomain_user natural join thread natural join file) join subdomain on(thread.subdomain_id = subdomain.id) WHERE username = ? ORDER BY points DESC, date_posted DESC';
-	var findSubUserNotIn = 'select id, name from subdomain where id not in' + '(select subdomain_id from subdomain_user where username = ?) order by name;';
-	
-	if (user) {
-		console.log(user);
+	var username;
+	console.log(req.session['username']);
+
+	if (req.session['username'] == null) { // GUEST
+		//username = 'default'; // req.session['username'] = 'default';
+		res.render('initial', {nav: ALL_DOMAINS, subnav: ALL_SUBDOMAINS, user: username, threads: ALL_THREADS, subs: ALL_SUBDOMAINS, logged: false});
+	}
+
+	if (req.session['username'] != null) {
+		username = req.session['username'];
+
+		var findUserThreads = 'SELECT subdomain_id, username, thread.id, author, date_posted, title, context, points, name, filename ' +
+		'FROM (subdomain_user natural join thread natural join file) join subdomain on(thread.subdomain_id = subdomain.id) WHERE username = ? ORDER BY points DESC, date_posted DESC';
+		var findSubUserNotIn = 'select id, name from subdomain where id not in' + '(select subdomain_id from subdomain_user where username = ?) order by name;';
+		
+		console.log(username);
+		console.log(req.session)
 
 		pool.getConnection(function(err, client, done) {
-
-			client.query(findAllThreads, [user], function(err, result) {
-
-				client.query(findSubUserNotIn, [user], function(err, subs) {
+			client.query(findUserThreads, [user], function(err, threads) {
+				client.query(findSubUserNotIn, [user], function(err, subsUserNotIn) {
 
 					client.release();
-					res.render('initial', {nav: req.session[user].nav, subnav: req.session[user].subnav, logged: true, user: user, threads: result, subs: subs});
+					res.render('initial', {nav: req.session[username].nav, subnav: req.session[username].subnav, user: username, threads: threads, subs: subsUserNotIn, logged: true});
 				})
 			});
 		});
 	}
-
-	else {
-		res.render('initial', {logged: false});
-	}
 });
 
-router.get('/login', function(req, res){
-	res.render('login');
-});
+router.get('/auth', function(req, res) {
+	res.render('auth');
+}
 
-router.get('/register', function(req, res){
+router.get('/register', function(req, res) {
 	res.render('register');
 });
 
-router.post('/register', function(req, res){
+router.post('/register', function(req, res) {
 	var salt =  bcrypt.genSaltSync(10);
 	var {username, password, first_name, last_name, email, phone, company} = req.body;
 	var hash = bcrypt.hashSync(password, salt);
@@ -73,14 +107,14 @@ router.post('/register', function(req, res){
 					}
 
 					client.query(domainInsert, [1, username, false], function(err, result) {
+						client.release();
 						if (err) 
 							console.log('Error running query', err);
 						for (var key in defaultSub) {
 							client.query(subInsert, [defaultSub[key], username, false]);
 						}
 
-						client.release();
-						res.redirect('/');
+						res.redirect('/login');
 					});
 				});
 			}
@@ -90,6 +124,10 @@ router.post('/register', function(req, res){
 			}
 		});
 	});
+});
+
+router.get('/login', function(req, res){
+	res.render('login');
 });
 
 router.post('/login', function(req, res) {
@@ -122,8 +160,9 @@ router.post('/login', function(req, res) {
 							client.query(findsubDomains, [req.body.username], function(err, result) {
 								client.release();
 								var subs = result;
-								req.session[req.body.username] = {nav: domains, subnav: subs};
-								res.redirect('/?username=' + req.body.username);
+
+								req.session[req.body.username] = {nav: domains, subnav: subs}; // customized sharit for user
+								res.redirect('/');
 							});
 						});
 					}
@@ -141,8 +180,8 @@ router.post('/login', function(req, res) {
 	});
 });
 
-router.get('/logout/:user', function(req, res) {
-	delete req.session[req.params.user];
+router.get('/logout', function(req, res) {
+	delete req.session[req.session['username']];
 	res.redirect('/');
 });
 

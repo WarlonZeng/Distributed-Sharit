@@ -1,14 +1,17 @@
-{{#if logged}}
 <div class="row">
 	<div class="col-md-3 col-md-offset-1">
-		<a href="/NYU/{{user}}/createSub"><button class="btn btn-success">Create Subdomain</button></a>
-		<a href="/logout/{{user}}"><button class="btn btn-danger">Logout</button></a><br><br>
+		<a href="/NYU/createSub"><button class="btn btn-success">Create Subdomain</button></a>
+		{{#if logged}}
+		<a href="/logout"><button class="btn btn-danger">Logout</button></a><br><br>
+		{{else}}
+		<a href="/login"><button class="btn btn-danger">Login</button></a><br><br>
+		{{/if}}
 		<div class="dropdown">
 			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Join Subdomain
 				<span class="caret"></span></button>
 				<ul class="dropdown-menu">
 					{{#each subs}}
-						<li><a href="/joinSub/{{id}}/{{../user}}">{{name}}</a></li>
+						<li><a href="/joinSub/{{id}}">{{name}}</a></li>
 					{{/each}}
 				</ul>
 			</div>
@@ -18,12 +21,12 @@
 		{{#each threads}}
 			<div class="jumbotron">
 				<div class="votes">
-					<input type="image" class="upVoteThread voteButts" info="/voteThread/{{../user}}/{{id}}/1" id={{id}} src="/images/up.png" /><br>
+					<input type="image" class="upVoteThread voteButts" info="/voteThread/{{id}}/1" id={{id}} src="/images/up.png" /><br>
 					<span>{{points}}</span><br>
-					<input type="image" class="downVoteThread voteButts" info="/voteThread/{{../user}}/{{id}}/-1" id={{id}} src="/images/down.png" /><br>
+					<input type="image" class="downVoteThread voteButts" info="/voteThread/{{id}}/-1" id={{id}} src="/images/down.png" /><br>
 				</div>
 				<div>
-					<h2><u><a href="/NYU/{{name}}/{{subdomain_id}}/{{../user}}/{{id}}">{{title}}</a><br></u></h2>
+					<h2><u><a href="/NYU/{{name}}/{{subdomain_id}}/{{id}}">{{title}}</a><br></u></h2>
 					<h4>{{context}}</h4>
 					<h5>Created by: <u>{{author}}</u> on {{date_posted}}</h5>
 					{{#if this.filename}}
@@ -34,17 +37,3 @@
 		{{/each}}
 	</div>
 </div>
-
-{{else}}
-
-<div class="container">
-	<div class="row">
-		<div class="col-md-4 col-md-offset-4">
-			<div class="jumbotron">
-				<a href="/login"><button class="btn btn-primary init">Login</button></a>
-				<a href="/register"><button class="btn btn-danger init">Register</button></a>
-			</div>
-		</div>
-	</div>
-</div>
-{{/if}}
