@@ -5,6 +5,8 @@ Website will get updated over the semester.
 
 * Google drive Link
  * https://drive.google.com/open?id=0B8SEHfpAjaYCYXlfWkdCUWZxZGc
+ 
+![distributed_web_app_alpha](https://github.com/WarlonZeng/Distributed-Sharit/blob/master/distributed_web_app_alpha.png)
 
 ## Overview
 Distributed Sharit follows a new roadmap architecture to provide high availability (no single point of failure) in the distributed system. Sharit is a website developed to share information between users of established organizations. Main features supported are file sharing with threads, comments for users to communicate with one another.
