@@ -1,0 +1,25 @@
+{{#if sub}}
+<a href="/NYU/{{sub}}/{{subid}}/{{user}}/createThread"><button class="btn btn-warning">Create Thread</button></a>
+{{/if}}
+</br></br>
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
+		{{#each threads}}
+			<div class="jumbotron">
+				<div class="votes">
+					<input type="image" class="upVoteThread voteButts" info="/voteThread/{{../user}}/{{id}}/1" id={{id}} src="/images/up.png" /><br>
+					<span>{{points}}</span><br>
+					<input type="image" class="downVoteThread voteButts" info="/voteThread/{{../user}}/{{id}}/-1" id={{id}} src="/images/down.png" /><br>
+				</div>
+				<div>
+					<h2><u><a href="/NYU/{{../sub}}/{{../subid}}/{{../user}}/{{id}}">{{title}}</a><br></u></h2>
+					<h4>{{context}}</h4>
+					<h5>Created by: <u>{{author}}</u> on {{date_posted}}</h5>
+					{{#if this.filename}}
+						Attached File: <a href="/downloadFile/{{id}}" target="_blank">{{filename}}</a>
+					{{/if}}
+				</div>
+			</div><br>
+		{{/each}}
+	</div>
+</div>

@@ -1,0 +1,41 @@
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
+		<div class="jumbotron">
+			<div class="votes">
+				<input type="image" class="upVoteThread voteButts" info="/voteThread/{{user}}/{{thread.id}}/1" id={{thread.id}} src="/images/up.png" /><br>
+				<span>{{thread.points}}</span><br>
+				<input type="image" class="downVoteThread" info="/voteThread/{{user}}/{{thread.id}}/-1" id={{thread.id}} src="/images/down.png" class="voteButts" /><br>
+			</div>
+			<div>
+				<h2>{{thread.title}}<br></h2>
+				<h4>{{thread.context}}</h4>
+				<h5>Created by: <u>{{thread.author}}</u> on {{thread.date_posted}}</h5>
+				{{#if filename}}
+				Attached File: <a href="/downloadFile/{{thread.id}}" target="_blank">{{filename.filename}}</a>
+				{{/if}}
+			</div>
+		</div><br>
+	</div>
+</div>
+
+<form method="POST" action="/NYU/{{sub}}/{{subid}}/{{user}}/{{thread_id}}">
+	<div class="form-group">
+		<textarea rows="10" cols="50" placeholder="Comment Here" name="comment" required></textarea><br>
+		<input type="submit" class="btn btn-primary" value="Comment" />
+	</div>
+</form>
+
+{{#each comments}}
+	<hr>
+	<div class="comments">
+		<div class="votes">
+			<input type="image" class="upVoteCom comButts" info="/voteComment/{{../user}}/{{id}}/1" id={{id}} src="/images/up.png" /><br>
+			<span>{{points}}</span><br>
+			<input type="image" class="downVoteCom comButts" info="/voteComment/{{../user}}/{{id}}/-1" id={{id}} src="/images/down.png" /><br>
+		</div>
+		<div class="comment-info">
+			<h3>{{comment}}</h3>
+			<h5>By: <u>{{author}}</u> on {{date_posted}}</h5>
+		</div>
+	</div>
+{{/each}}

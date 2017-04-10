@@ -7,7 +7,6 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 
 var index = require('./routes/index');
-var users = require('./routes/users');
 var subDom = require('./routes/subDom');
 var thread = require('./routes/thread');
 var comment = require('./routes/comment');
@@ -29,13 +28,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 var sessionOptions = {
 	secret: 'as89audacn123kjx24n238x',
 	saveUninitialized: false, 
-	resave: false
+	resave: true
 }
 
 app.use(session(sessionOptions));
 
 app.use('/', index);
-app.use('/users', users);
 app.use('/', subDom);
 app.use('/', thread);
 app.use('/', comment);

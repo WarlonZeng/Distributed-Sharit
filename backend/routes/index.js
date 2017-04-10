@@ -34,23 +34,19 @@ pool.getConnection(function(err, client, done) {
 	});
 });
 
-// methods:
-// get homepage
-// get auth
-// get register page
-// post register page
-// get login page
-// post login page
-// get logout?
-
 /* GET home page. */
 router.get('/', function(req, res) {
 	var username;
-	console.log(req.session['username']);
+	//console.log(req.session['username']);
+	console.log(req.session);
 
 	if (req.session['username'] == null) { // GUEST
-		//username = 'default'; // req.session['username'] = 'default';
-		res.render('initial', {nav: ALL_DOMAINS, subnav: ALL_SUBDOMAINS, user: username, threads: ALL_THREADS, subs: ALL_SUBDOMAINS, logged: false});
+		// username = 'guest'; // req.session['username'] = 'default';
+		// req.session[username] = {nav: ALL_DOMAINS, subnav: ALL_SUBDOMAINS};
+		// res.render('initial', {nav: req.session[username].nav, subnav: req.session[username].subnav, threads: ALL_THREADS, subs: ALL_SUBDOMAINS, logged: false});
+		// console.log(ALL_DOMAINS, ALL_SUBDOMAINS, ALL_THREADS);
+		// res.render('initial', {nav: ALL_DOMAINS, nav: ALL_SUBDOMAINS, threads: ALL_THREADS, subs: ALL_SUBDOMAINS, logged: false});
+		res.json({ALL_DOMAINS, ALL_SUBDOMAINS, ALL_THREADS, logged: false});
 	}
 
 	if (req.session['username'] != null) {
@@ -68,7 +64,8 @@ router.get('/', function(req, res) {
 				client.query(findSubUserNotIn, [user], function(err, subsUserNotIn) {
 
 					client.release();
-					res.render('initial', {nav: req.session[username].nav, subnav: req.session[username].subnav, user: username, threads: threads, subs: subsUserNotIn, logged: true});
+					//res.render('initial', {nav: req.session[username].nav, subnav: req.session[username].subnav, threads: threads, subs: subsUserNotIn, logged: true});
+					res.json({nav: req.session[username].nav, subnav: req.session[username].subnav, threads: threads, subs: subsUserNotIn, logged: true});
 				})
 			});
 		});
@@ -77,7 +74,7 @@ router.get('/', function(req, res) {
 
 router.get('/auth', function(req, res) {
 	res.render('auth');
-}
+});
 
 router.get('/register', function(req, res) {
 	res.render('register');
@@ -162,7 +159,19 @@ router.post('/login', function(req, res) {
 								var subs = result;
 
 								req.session[req.body.username] = {nav: domains, subnav: subs}; // customized sharit for user
-								res.redirect('/');
+								//res.redirect('/');
+								req.session.cookie.username = {nav: domains, subnav: subs};
+								
+								console.log(req.session);
+
+								req.session.save(function(err) {
+									if (err)
+										console.log(err);
+									res.json("authorized");
+								});
+
+								// req.session.save();
+								// res.json("authorized");
 							});
 						});
 					}

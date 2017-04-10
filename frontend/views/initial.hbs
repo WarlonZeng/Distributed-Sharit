@@ -1,0 +1,43 @@
+<div class="row">
+	<div class="col-md-3 col-md-offset-1">
+		<br><br><br>
+		<a href="/NYU/createSub"><button class="btn btn-success">Create Subdomain</button></a>
+
+		{{#if logged}}
+		<a href="/logout"><button class="btn btn-danger">Logout</button></a><br><br>
+		{{else}}
+		<a href="/login"><button class="btn btn-danger">Login</button></a><br><br>
+		{{/if}}
+
+
+		<div class="dropdown">
+			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Join Subdomain
+				<span class="caret"></span></button>
+				<ul class="dropdown-menu">
+					{{#each subs}}
+						<li><a href="/joinSub/{{id}}">{{name}}</a></li>
+					{{/each}}
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-6 col-md-offset-3">
+		{{#each threads}}
+			<div class="jumbotron">
+				<div class="votes">
+					<input type="image" class="upVoteThread voteButts" info="/voteThread/{{id}}/1" id={{id}} src="/images/up.png" /><br>
+					<span>{{points}}</span><br>
+					<input type="image" class="downVoteThread voteButts" info="/voteThread/{{id}}/-1" id={{id}} src="/images/down.png" /><br>
+				</div>
+				<div>
+					<h2><u><a href="/NYU/{{name}}/{{subdomain_id}}/{{id}}">{{title}}</a><br></u></h2>
+					<h4>{{context}}</h4>
+					<h5>Created by: <u>{{author}}</u> on {{date_posted}}</h5>
+					{{#if this.filename}}
+						Attached File: <a href="/downloadFile/{{id}}" target="_blank">{{filename}}</a>
+					{{/if}}
+				</div>
+			</div><br>
+		{{/each}}
+	</div>
+</div>
