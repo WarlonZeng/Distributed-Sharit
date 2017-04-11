@@ -73,7 +73,8 @@ router.get('/joinSub/:subid', function(req, res) {
 			client.query(findSubDomains, [req.params.user], function(err, result) {
 				client.release();
 				req.session[req.session['username']].subnav = result;
-				res.redirect('/');
+				// res.redirect('/');
+				res.json({subnav: req.session[req.session['username']].subnav});
 			});
 		});
 	});

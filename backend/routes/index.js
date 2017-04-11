@@ -36,28 +36,18 @@ pool.getConnection(function(err, client, done) {
 
 /* GET home page. */
 router.get('/', function(req, res) {
-	var username;
-	//console.log(req.session['username']);
 	console.log(req.session);
 
-	if (req.session['username'] == null) { // GUEST
-		// username = 'guest'; // req.session['username'] = 'default';
-		// req.session[username] = {nav: ALL_DOMAINS, subnav: ALL_SUBDOMAINS};
-		// res.render('initial', {nav: req.session[username].nav, subnav: req.session[username].subnav, threads: ALL_THREADS, subs: ALL_SUBDOMAINS, logged: false});
-		// console.log(ALL_DOMAINS, ALL_SUBDOMAINS, ALL_THREADS);
-		// res.render('initial', {nav: ALL_DOMAINS, nav: ALL_SUBDOMAINS, threads: ALL_THREADS, subs: ALL_SUBDOMAINS, logged: false});
+	if (req.session['username'] == null) { // not logged in
 		res.json({ALL_DOMAINS, ALL_SUBDOMAINS, ALL_THREADS, logged: false});
 	}
 
 	if (req.session['username'] != null) {
-		username = req.session['username'];
+		var username = req.session['username'];
 
 		var findUserThreads = 'SELECT subdomain_id, username, thread.id, author, date_posted, title, context, points, name, filename ' +
 		'FROM (subdomain_user natural join thread natural join file) join subdomain on(thread.subdomain_id = subdomain.id) WHERE username = ? ORDER BY points DESC, date_posted DESC';
 		var findSubUserNotIn = 'select id, name from subdomain where id not in' + '(select subdomain_id from subdomain_user where username = ?) order by name;';
-		
-		console.log(username);
-		console.log(req.session)
 
 		pool.getConnection(function(err, client, done) {
 			client.query(findUserThreads, [user], function(err, threads) {
@@ -127,7 +117,7 @@ router.get('/login', function(req, res){
 	res.render('login');
 });
 
-router.post('/login', function(req, res) {
+router.post('/login', function(req, res) { // get all domains and subdomains this user is in
 	var findSalt = 'SELECT salt FROM user WHERE username = ?';
 	var validLogin = 'SELECT * FROM user WHERE username = ? and hash = ?';
 	var findDomains = 'SELECT name, id from domain_user NATURAL JOIN domain WHERE username = ?';
@@ -136,13 +126,13 @@ router.post('/login', function(req, res) {
 	pool.getConnection(function(err, client, done) {
 		if (err) {
 			console.log('Error running query', err);
-			res.render('error', {error: err})
+			res.json('error', {error: err});
 		}
 
 		client.query(findSalt, [req.body.username], function(err, result) {
 			if (err) {
 				console.log('Error running query', err);
-				res.render('error', {error: err})
+				res.json('error', {error: err});
 			}
 
 			if (result.length !== 0) {
@@ -156,18 +146,18 @@ router.post('/login', function(req, res) {
 
 							client.query(findsubDomains, [req.body.username], function(err, result) {
 								client.release();
-								var subs = result;
+								var subdomains = result;
 
-								req.session[req.body.username] = {nav: domains, subnav: subs}; // customized sharit for user
-								//res.redirect('/');
-								req.session.cookie.username = {nav: domains, subnav: subs};
+								req.session[req.body.username] = {nav: domains, subnav: subdomains};
+								req.session["username"] = req.body.username;
+								//req.session.cookie.username = {nav: domains, subnav: subs};
 								
-								console.log(req.session);
+								// console.log(req.session);
 
 								req.session.save(function(err) {
 									if (err)
 										console.log(err);
-									res.json("authorized");
+									res.json(req.session);
 								});
 
 								// req.session.save();

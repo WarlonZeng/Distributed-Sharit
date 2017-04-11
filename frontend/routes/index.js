@@ -11,32 +11,28 @@ var defaultSub = {
 	Chem: 4
 }
 
-/* GET home page. */
 router.get('/', function(req, res) {
-
 	request.get({
     	url: 'http://localhost:3000',
     	json: true
 	}, function(error, response, body) {
 
 		var username;
-		//console.log(req.session['username']);
-		console.log(req.session);
-
 		console.log(response.body);
-		
+
 		if (req.session['username'] == null) { // GUEST
 			res.render('initial', {nav: response.body.ALL_DOMAINS, subnav: response.body.ALL_SUBDOMAINS, threads: response.body.ALL_THREADS, subs: response.body.ALL_SUBDOMAINS, logged: response.body.logged});
 		}
 
 		if (req.session['username'] != null) {
-			username = req.session['username'];
+			//username = req.session['username'];
+			// console.log(req.session);
+			// console.log(response.body);
 
-			console.log(username);
-			console.log(req.session)
 
-			res.render('initial', {nav: req.session[username].nav, subnav: req.session[username].subnav, threads: threads, subs: subsUserNotIn, logged: true});
+			// res.render('initial', {nav: req.session[username].nav, subnav: req.session[username].subnav, threads: threads, subs: subsUserNotIn, logged: true});
 			// res.render('initial', {nav: response.body.ALL_DOMAINS, subnav: response.body.ALL_SUBDOMAINS, threads: response.body.ALL_THREADS, subs: response.body.ALL_DOMAINS, logged: repsonse.body.logged});
+			res.json(response.body);
 		}
 	});
 
@@ -67,9 +63,12 @@ router.get('/login', function(req, res){
 router.post('/login', function(req, res) {
 	request.post({
     	url: 'http://localhost:3000/login',
-    	form: {"username":"wz634", "password":"root"}
+    	json: true,
+    	form: {"username": req.body.username, "password": req.body.password}
 	}, function(error, response, body) {
-		console.log(response.body);
+		// console.log(response.body);
+		req.session[req.body.username] = {nav: response.body.username.nav, subnav: response.body.username.subnav};
+		req.session["username"] = response.body.username;
 		res.redirect("/");
 	});
 });
