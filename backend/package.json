@@ -28,6 +28,8 @@
     "multer": "^1.2.0",
     "mysql": "^2.13.0",
     "serve-favicon": "~2.4.1",
-    "request": "^2.81.0"
+    "request": "~2.81.0",
+    "connect-redis": "~3.2.0",
+    "redis": "~2.7.1"
   }
 }

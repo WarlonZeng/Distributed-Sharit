@@ -16,26 +16,23 @@ router.get('/', function(req, res) {
     	url: 'http://localhost:3000',
     	json: true
 	}, function(error, response, body) {
+		console.log("req.sessionID", req.sessionID);
+		// console.log("req.session.id", req.sesssion.id);
+		console.log("req.session", req.session);
+		console.log("req.cookies", req.cookies); // saved
+		console.log("req.session.cookie", req.session.cookie);
 
-		var username;
-		console.log(response.body);
 
-		if (req.session['username'] == null) { // GUEST
+		if (!req.session['data']) {
 			res.render('initial', {nav: response.body.ALL_DOMAINS, subnav: response.body.ALL_SUBDOMAINS, threads: response.body.ALL_THREADS, subs: response.body.ALL_SUBDOMAINS, logged: response.body.logged});
 		}
 
-		if (req.session['username'] != null) {
-			//username = req.session['username'];
-			// console.log(req.session);
-			// console.log(response.body);
-
-
+		else if (req.session['data']) {
 			// res.render('initial', {nav: req.session[username].nav, subnav: req.session[username].subnav, threads: threads, subs: subsUserNotIn, logged: true});
 			// res.render('initial', {nav: response.body.ALL_DOMAINS, subnav: response.body.ALL_SUBDOMAINS, threads: response.body.ALL_THREADS, subs: response.body.ALL_DOMAINS, logged: repsonse.body.logged});
 			res.json(response.body);
 		}
 	});
-
 });
 
 router.get('/auth', function(req, res) {
@@ -66,9 +63,11 @@ router.post('/login', function(req, res) {
     	json: true,
     	form: {"username": req.body.username, "password": req.body.password}
 	}, function(error, response, body) {
-		// console.log(response.body);
-		req.session[req.body.username] = {nav: response.body.username.nav, subnav: response.body.username.subnav};
-		req.session["username"] = response.body.username;
+		// req.session[req.body.username] = {nav: response.body[response.body.username].nav, subnav: response.body[response.body.username].subnav};
+
+		req.session["data"] = response.body;
+		console.log(response.body);
+
 		res.redirect("/");
 	});
 });

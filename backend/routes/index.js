@@ -34,15 +34,18 @@ pool.getConnection(function(err, client, done) {
 	});
 });
 
-/* GET home page. */
 router.get('/', function(req, res) {
-	console.log(req.session);
+		console.log("req.sessionID", req.sessionID);
+		// console.log("req.session.id", req.sesssion.id);
+		console.log("req.session", req.session);
+		console.log("req.cookies", req.cookies);
+		console.log("req.session.cookie", req.session.cookie);
 
-	if (req.session['username'] == null) { // not logged in
+	if (!req.cookies.sessionID) { // not logged in
 		res.json({ALL_DOMAINS, ALL_SUBDOMAINS, ALL_THREADS, logged: false});
 	}
 
-	if (req.session['username'] != null) {
+	else if (req.cookies.sessionID) { // not logged in
 		var username = req.session['username'];
 
 		var findUserThreads = 'SELECT subdomain_id, username, thread.id, author, date_posted, title, context, points, name, filename ' +
@@ -55,7 +58,8 @@ router.get('/', function(req, res) {
 
 					client.release();
 					//res.render('initial', {nav: req.session[username].nav, subnav: req.session[username].subnav, threads: threads, subs: subsUserNotIn, logged: true});
-					res.json({nav: req.session[username].nav, subnav: req.session[username].subnav, threads: threads, subs: subsUserNotIn, logged: true});
+					// res.json({nav: req.session[username].nav, subnav: req.session[username].subnav, threads: threads, subs: subsUserNotIn, logged: true});
+					res.json('hi');
 				})
 			});
 		});
@@ -124,23 +128,16 @@ router.post('/login', function(req, res) { // get all domains and subdomains thi
 	var findsubDomains = 'SELECT name, id from subdomain_user as perm JOIN subdomain as dom ON (perm.subdomain_id = dom.id) WHERE username = ?';
 	
 	pool.getConnection(function(err, client, done) {
-		if (err) {
-			console.log('Error running query', err);
-			res.json('error', {error: err});
-		}
-
 		client.query(findSalt, [req.body.username], function(err, result) {
 			if (err) {
 				console.log('Error running query', err);
 				res.json('error', {error: err});
 			}
-
 			if (result.length !== 0) {
 				var hash = bcrypt.hashSync(req.body.password, result[0].salt);
 
 				client.query(validLogin, [req.body.username, hash], function(err, result) {
 					if (result.length != 0) {
-						
 						client.query(findDomains, [req.body.username], function(err, result) {
 							var domains = result;
 
@@ -148,32 +145,25 @@ router.post('/login', function(req, res) { // get all domains and subdomains thi
 								client.release();
 								var subdomains = result;
 
-								req.session[req.body.username] = {nav: domains, subnav: subdomains};
-								req.session["username"] = req.body.username;
-								//req.session.cookie.username = {nav: domains, subnav: subs};
-								
-								// console.log(req.session);
+								req.session.data = {username: req.body.username, nav: domains, subnav: subdomains, sessionid: req.sessionID};
+								console.log(req.sessionID);
 
-								req.session.save(function(err) {
-									if (err)
-										console.log(err);
-									res.json(req.session);
+								req.session.save(function() {
+									// res.cookie('sessionID', req.sessionID, { httpOnly: false });
+									res.json(req.session.data);
 								});
-
-								// req.session.save();
-								// res.json("authorized");
 							});
 						});
 					}
 					else {
 						client.release();
-						res.redirect('/login');
+						res.json("Unauthorized Login");
 					}
 				});
 			}
 			else {
 				client.release();
-				res.redirect('/login');
+				res.json("Unauthorized Login");
 			}
 		});
 	});

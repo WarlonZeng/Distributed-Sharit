@@ -28,7 +28,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 var sessionOptions = {
 	secret: 'as89audacn123kjx24n238x',
 	saveUninitialized: false, 
-	resave: true
+	resave: false,
+	cookie: {
+		httpOnly: false,
+		expires: false,
+		secure: false
+	}
 }
 
 app.use(session(sessionOptions));
@@ -55,5 +60,14 @@ app.use(function(err, req, res, next) {
 	res.status(err.status || 500);
 	res.render('error');
 });
+
+// app.use(function(req, res, next) {
+// 	res.setHeader('Access-Control-Allow-Credentials', 'true');
+// 	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+// 	res.setHeader('Access-Control-Allow-Origin', 'http://localhost');
+// 	res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, content-type, Authorization, Accept');
+// 	next();
+// });
+
 
 module.exports = app;
