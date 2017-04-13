@@ -29,6 +29,8 @@
     "mysql": "^2.13.0",
     "serve-favicon": "~2.4.1",
     "request": "^2.81.0",
-    "jquery": "^3.2.1"
+    "jquery": "^3.2.1",
+    "connect-redis": "~3.2.0",
+    "redis": "~2.7.1"
   }
 }

@@ -12,27 +12,31 @@ var defaultSub = {
 }
 
 router.get('/', function(req, res) {
-	request.get({
-    	url: 'http://localhost:3000',
-    	json: true
-	}, function(error, response, body) {
-		console.log("req.sessionID", req.sessionID);
-		// console.log("req.session.id", req.sesssion.id);
-		console.log("req.session", req.session);
-		console.log("req.cookies", req.cookies); // saved
-		console.log("req.session.cookie", req.session.cookie);
+	console.log("req.sessionID:", req.sessionID);
+	console.log("req.session:", req.session);
+	console.log("req.cookies:", req.cookies); // saved
+	console.log("req.session.cookie:", req.session.cookie);
+	console.log("req.session['username']:", req.session['username']);
+	console.log("req.session['data']:", req.session['data']);
 
+	if (req.session['data'] == null) {
+		request.get({
+    		url: 'http://localhost:3000',
+    		json: true
+		}, function(error, response, body) {
+			res.render('initial', {nav: response.body.ALL_DOMAINS, subnav: response.body.ALL_SUBDOMAINS, subs: response.body.ALL_SUBDOMAINS, threads: response.body.ALL_THREADS, logged: response.body.logged});
+		});
+	}
 
-		if (!req.session['data']) {
-			res.render('initial', {nav: response.body.ALL_DOMAINS, subnav: response.body.ALL_SUBDOMAINS, threads: response.body.ALL_THREADS, subs: response.body.ALL_SUBDOMAINS, logged: response.body.logged});
-		}
-
-		else if (req.session['data']) {
-			// res.render('initial', {nav: req.session[username].nav, subnav: req.session[username].subnav, threads: threads, subs: subsUserNotIn, logged: true});
-			// res.render('initial', {nav: response.body.ALL_DOMAINS, subnav: response.body.ALL_SUBDOMAINS, threads: response.body.ALL_THREADS, subs: response.body.ALL_DOMAINS, logged: repsonse.body.logged});
-			res.json(response.body);
-		}
-	});
+	else if (req.session['data'] != null) {
+		request.post({
+    		url: 'http://localhost:3000',
+    		json: true,
+    		form: {username: req.session['data'].username}
+		}, function(error, response, body) { // user_threads, user_subdomains_not_in initialized and retrieved
+			res.render('initial', {nav: req.session['data'].user_domains, subnav: req.session['data'].user_subdomains, subs: response.body.user_subdomains_not_in, threads: response.body.user_threads, logged: response.body.logged});
+		});
+	}
 });
 
 router.get('/auth', function(req, res) {
@@ -63,11 +67,7 @@ router.post('/login', function(req, res) {
     	json: true,
     	form: {"username": req.body.username, "password": req.body.password}
 	}, function(error, response, body) {
-		// req.session[req.body.username] = {nav: response.body[response.body.username].nav, subnav: response.body[response.body.username].subnav};
-
-		req.session["data"] = response.body;
-		console.log(response.body);
-
+		req.session["data"] = response.body; // user_domains and user_subdomains initialized and retrieved
 		res.redirect("/");
 	});
 });

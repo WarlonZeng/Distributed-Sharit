@@ -34,45 +34,26 @@ pool.getConnection(function(err, client, done) {
 	});
 });
 
-router.get('/', function(req, res) {
-		console.log("req.sessionID", req.sessionID);
-		// console.log("req.session.id", req.sesssion.id);
-		console.log("req.session", req.session);
-		console.log("req.cookies", req.cookies);
-		console.log("req.session.cookie", req.session.cookie);
+router.get('/', function(req, res) { // General domains and subdomains
+	res.json({ALL_DOMAINS, ALL_SUBDOMAINS, ALL_THREADS, logged: false});
+});
 
-	if (!req.cookies.sessionID) { // not logged in
-		res.json({ALL_DOMAINS, ALL_SUBDOMAINS, ALL_THREADS, logged: false});
-	}
+router.post('/', function(req, res) { // User specific domains and subdomains
+	var username = req.body.username;
 
-	else if (req.cookies.sessionID) { // not logged in
-		var username = req.session['username'];
+	var findUserThreads = 'SELECT subdomain_id, username, thread.id, author, date_posted, title, context, points, name, filename ' +
+	'FROM (subdomain_user natural join thread natural join file) join subdomain on(thread.subdomain_id = subdomain.id) WHERE username = ? ORDER BY points DESC, date_posted DESC';
+	var findSubUserNotIn = 'select id, name from subdomain where id not in' + '(select subdomain_id from subdomain_user where username = ?) order by name;';
 
-		var findUserThreads = 'SELECT subdomain_id, username, thread.id, author, date_posted, title, context, points, name, filename ' +
-		'FROM (subdomain_user natural join thread natural join file) join subdomain on(thread.subdomain_id = subdomain.id) WHERE username = ? ORDER BY points DESC, date_posted DESC';
-		var findSubUserNotIn = 'select id, name from subdomain where id not in' + '(select subdomain_id from subdomain_user where username = ?) order by name;';
-
-		pool.getConnection(function(err, client, done) {
-			client.query(findUserThreads, [user], function(err, threads) {
-				client.query(findSubUserNotIn, [user], function(err, subsUserNotIn) {
-
-					client.release();
-					//res.render('initial', {nav: req.session[username].nav, subnav: req.session[username].subnav, threads: threads, subs: subsUserNotIn, logged: true});
-					// res.json({nav: req.session[username].nav, subnav: req.session[username].subnav, threads: threads, subs: subsUserNotIn, logged: true});
-					res.json('hi');
-				})
+	pool.getConnection(function(err, client, done) {
+		client.query(findUserThreads, [username], function(err, user_threads) {
+			client.query(findSubUserNotIn, [username], function(err, user_subdomains_not_in) {
+				client.release();
+				res.json({user_threads, user_subdomains_not_in, logged: true}); 
 			});
 		});
-	}
-});
-
-router.get('/auth', function(req, res) {
-	res.render('auth');
-});
-
-router.get('/register', function(req, res) {
-	res.render('register');
-});
+	});
+})
 
 router.post('/register', function(req, res) {
 	var salt =  bcrypt.genSaltSync(10);
@@ -138,40 +119,27 @@ router.post('/login', function(req, res) { // get all domains and subdomains thi
 
 				client.query(validLogin, [req.body.username, hash], function(err, result) {
 					if (result.length != 0) {
-						client.query(findDomains, [req.body.username], function(err, result) {
-							var domains = result;
-
-							client.query(findsubDomains, [req.body.username], function(err, result) {
+						client.query(findDomains, [req.body.username], function(err, user_domains) {
+							client.query(findsubDomains, [req.body.username], function(err, user_subdomains) {
 								client.release();
-								var subdomains = result;
-
-								req.session.data = {username: req.body.username, nav: domains, subnav: subdomains, sessionid: req.sessionID};
-								console.log(req.sessionID);
-
-								req.session.save(function() {
-									// res.cookie('sessionID', req.sessionID, { httpOnly: false });
-									res.json(req.session.data);
-								});
+								
+								var data = {username: req.body.username, user_domains, user_subdomains, sessionID: req.sessionID};
+								res.json(data);
 							});
 						});
 					}
 					else {
 						client.release();
-						res.json("Unauthorized Login");
+						res.json("Invalid username or password");
 					}
 				});
 			}
 			else {
 				client.release();
-				res.json("Unauthorized Login");
+				res.json("Invalid username or password");
 			}
 		});
 	});
-});
-
-router.get('/logout', function(req, res) {
-	delete req.session[req.session['username']];
-	res.redirect('/');
 });
 
 module.exports = router;
