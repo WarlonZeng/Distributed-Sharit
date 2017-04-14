@@ -1,24 +1,18 @@
 var express = require('express');
 var mysql = require('mysql');
-
 var router = express.Router();
 var mysql = require('mysql');
 var configDB = require('../config/dbconfig.js');
 var pool = new mysql.createPool(configDB);
 
-// methods:
-// get subdomain page
-// get create subdomain page
-// post create subdomain page
-// get join subdomain
-
-router.get('/NYU/:sub/:subid', function(req, res) {
-	var findThreads = 'SELECT subdomain_id, thread.id, author, date_posted, title, context, points, filename from thread JOIN file ON(thread.id = file.thread_id) WHERE subdomain_id = ? ORDER BY points DESC';
+router.get('/:domain_name/:subdomain_name', function(req, res) {
+	var findThreads = 'SELECT * FROM domain NATURAL JOIN subdomain NATURAL JOIN thread NATURAL JOIN file WHERE subdomain_name = ? ORDER BY points DESC';
 	
 	pool.getConnection(function(err, client, done) {
-		client.query(findThreads, [req.params.subid], function(err, result) {
+		client.query(findThreads, [req.params.subdomain_name], function(err, result) {
 			client.release();
-			res.render('index', {threads: result, nav: req.session[user].nav, subnav: req.session[user].subnav, user: user, subid: req.params.subid, sub: req.params.sub});
+			// res.render('index', {threads: result, nav: req.session[user].nav, subnav: req.session[user].subnav, user: username, sub: req.params.subdomain_name});
+			res.json({threads: result});
 		});
 	});
 });
@@ -65,7 +59,7 @@ router.get('/joinSub/:subid', function(req, res) {
 		res.redirect('/auth');
 	}
 
-	var insertSub = 'insert into subdomain_user values(?, ?, false);';
+	var insertSub = 'insert into subdomain_user (id, name, domain_id) values(?, ?, false);';
 	var findSubDomains = 'SELECT name, id from subdomain_user as perm JOIN subdomain as dom ON(perm.subdomain_id = dom.id) WHERE username = ?';
 	
 	pool.getConnection(function(err, client, done) {
@@ -73,7 +67,8 @@ router.get('/joinSub/:subid', function(req, res) {
 			client.query(findSubDomains, [req.params.user], function(err, result) {
 				client.release();
 				req.session[req.session['username']].subnav = result;
-				res.redirect('/');
+				// res.redirect('/');
+				res.json({subnav: req.session[req.session['username']].subnav});
 			});
 		});
 	});

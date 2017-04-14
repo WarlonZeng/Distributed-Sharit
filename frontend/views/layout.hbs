@@ -22,7 +22,7 @@
 		<div class={"navbar-collapse " + navClass} id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
 				{{#each nav}}
-					<li><a href="/?username={{../user}}">{{name}}</a></li>
+					<li><a href="/">{{domain_name}}</a></li>
 				{{/each}}
 			</ul>
 		</div>
@@ -31,7 +31,6 @@
 {{/if}}
 
 <div class="container">
-
 
 {{#if subnav}}
 	<nav class="navbar navbar-inverse" role="navigation" id="navSub">
@@ -47,7 +46,7 @@
 		<div class={"navbar-collapse " + navClass} id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
 				{{#each subnav}}
-					<li><a href="/NYU/{{name}}/{{id}}/{{../user}}">{{name}}</a></li>
+					<li><a href="/{{domain_name}}/{{subdomain_name}}">{{subdomain_name}}</a></li>
 				{{/each}}
 			</ul>
 		</div>

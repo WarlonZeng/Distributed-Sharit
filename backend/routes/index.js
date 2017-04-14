@@ -1,3 +1,5 @@
+require('./server_initialization');
+
 var express = require('express');
 var bcrypt = require('bcryptjs');
 
@@ -7,35 +9,22 @@ var configDB = require('../config/dbconfig.js');
 var pool = new mysql.createPool(configDB);
 
 var defaultSub = {
+	All: 0,
 	Bio: 1,
 	Math: 2,
 	CS: 3,
 	Chem: 4
 }
 
-var ALL_DOMAINS;
-var ALL_SUBDOMAINS;
-var ALL_THREADS;
-
-var FIND_ALL_DOMAINS = 'SELECT name, id FROM domain';
-var FIND_ALL_SUBDOMAINS = 'SELECT name, id FROM subdomain';
-var FIND_ALL_THREADS = 'SELECT * FROM subdomain NATURAL JOIN thread NATURAL JOIN file';
-
-pool.getConnection(function(err, client, done) {
-	client.query(FIND_ALL_DOMAINS, [], function(err, result) {
-		ALL_DOMAINS = result;
-		client.query(FIND_ALL_SUBDOMAINS, [], function(err, result) {
-			ALL_SUBDOMAINS = result;
-			client.query(FIND_ALL_THREADS, [], function(err, result) {
-				client.release();
-				ALL_THREADS = result;
-			});
-		});
-	});
-});
-
 router.get('/', function(req, res) { // General domains and subdomains
-	res.json({ALL_DOMAINS, ALL_SUBDOMAINS, ALL_THREADS, logged: false});
+	var find_all_threads = 'SELECT * FROM domain NATURAL JOIN subdomain NATURAL JOIN thread NATURAL JOIN file';
+	pool.getConnection(function(err, client, done) {
+		client.query(find_all_threads, [], function(err, all_threads) {
+			client.release();
+			all_threads = result;
+		});
+	}
+	res.json({ALL_DOMAINS, ALL_SUBDOMAINS, all_threads, LOGGED: false});
 });
 
 router.post('/', function(req, res) { // User specific domains and subdomains
@@ -49,7 +38,7 @@ router.post('/', function(req, res) { // User specific domains and subdomains
 		client.query(findUserThreads, [username], function(err, user_threads) {
 			client.query(findSubUserNotIn, [username], function(err, user_subdomains_not_in) {
 				client.release();
-				res.json({user_threads, user_subdomains_not_in, logged: true}); 
+				res.json({user_threads, user_subdomains_not_in}); 
 			});
 		});
 	});
@@ -69,30 +58,30 @@ router.post('/register', function(req, res) {
 
 		client.query(queryFind, [username], function(err, result) { 
 			if (err) {
-				res.render('error', {error: err})
+				res.json(err);
 			}
 			if (!result.length) {
 
 				client.query(queryInsert, [username, hash, first_name, last_name, email, phone, company, salt], function(err, result) {
 					if (err) {
-						res.render('error', {error: err})
+						res.json(err);
 					}
 
 					client.query(domainInsert, [1, username, false], function(err, result) {
+						if (err)
+							res.json(err);
 						client.release();
-						if (err) 
-							console.log('Error running query', err);
+
 						for (var key in defaultSub) {
 							client.query(subInsert, [defaultSub[key], username, false]);
 						}
-
-						res.redirect('/login');
+						res.json('Successful register, login to continue');
 					});
 				});
 			}
 			else {
 				client.release();
-				res.redirect('/register');
+				res.json('Unsuccessful register');
 			}
 		});
 	});
@@ -119,11 +108,11 @@ router.post('/login', function(req, res) { // get all domains and subdomains thi
 
 				client.query(validLogin, [req.body.username, hash], function(err, result) {
 					if (result.length != 0) {
-						client.query(findDomains, [req.body.username], function(err, user_domains) {
-							client.query(findsubDomains, [req.body.username], function(err, user_subdomains) {
+						client.query(findDomains, [req.body.username], function(err, NAV_DOMAINS) {
+							client.query(findsubDomains, [req.body.username], function(err, SUBNAV_DOMAINS) {
 								client.release();
-								
-								var data = {username: req.body.username, user_domains, user_subdomains, sessionID: req.sessionID};
+
+								var data = {username: req.body.username, NAV_DOMAINS, SUBNAV_DOMAINS, sessionID: req.sessionID, LOGGED: true};
 								res.json(data);
 							});
 						});

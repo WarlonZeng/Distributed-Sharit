@@ -1,25 +1,13 @@
 var express = require('express');
-var mysql = require('mysql');
-
 var router = express.Router();
-var mysql = require('mysql');
-var configDB = require('../config/dbconfig.js');
-var pool = new mysql.createPool(configDB);
 
-// methods:
-// get subdomain page
-// get create subdomain page
-// post create subdomain page
-// get join subdomain
-
-router.get('/NYU/:sub/:subid', function(req, res) {
-	var findThreads = 'SELECT subdomain_id, thread.id, author, date_posted, title, context, points, filename from thread JOIN file ON(thread.id = file.thread_id) WHERE subdomain_id = ? ORDER BY points DESC';
-	
-	pool.getConnection(function(err, client, done) {
-		client.query(findThreads, [req.params.subid], function(err, result) {
-			client.release();
-			res.render('index', {threads: result, nav: req.session[user].nav, subnav: req.session[user].subnav, user: user, subid: req.params.subid, sub: req.params.sub});
-		});
+router.get('/:domain_name/:subdomain_name', function(req, res) {
+	request.get({
+    	url: 'http://localhost:3000/' + req.params.domain_name + req.params.subdomain_name,
+    	json: true
+	}, function(error, response, body) {
+		console.log("response.body:", response.body);
+		res.render('index', {nav: req.session.data, subnav: response.body.ALL_SUBDOMAINS, subs: response.body.ALL_SUBDOMAINS, threads: response.body.ALL_THREADS, logged: logged});
 	});
 });
 
@@ -73,8 +61,7 @@ router.get('/joinSub/:subid', function(req, res) {
 			client.query(findSubDomains, [req.params.user], function(err, result) {
 				client.release();
 				req.session[req.session['username']].subnav = result;
-				// res.redirect('/');
-				res.json({subnav: req.session[req.session['username']].subnav});
+				res.redirect('/');
 			});
 		});
 	});
