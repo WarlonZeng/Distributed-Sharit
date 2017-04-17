@@ -5,44 +5,49 @@ var mysql = require('mysql');
 var configDB = require('../config/dbconfig.js');
 var pool = new mysql.createPool(configDB);
 
-router.get('/:domain_name/:subdomain_name', function(req, res) {
-	var findThreads = 'SELECT * FROM domain NATURAL JOIN subdomain NATURAL JOIN thread NATURAL JOIN file WHERE subdomain_name = ? ORDER BY points DESC';
+router.get('/NYU/:subdomain_name', function(req, res) {
+	var FIND_ALL_DOMAINS = 'SELECT domain_name, domain_id FROM domain';
+    var FIND_ALL_SUBDOMAINS = 'SELECT domain_name, subdomain_name, subdomain_id FROM subdomain NATURAL JOIN domain';
+	var find_subdomain_threads = 'SELECT * FROM domain NATURAL JOIN subdomain NATURAL JOIN thread NATURAL JOIN file WHERE subdomain_name = ? ORDER BY points DESC';
 	
 	pool.getConnection(function(err, client, done) {
-		client.query(findThreads, [req.params.subdomain_name], function(err, result) {
-			client.release();
-			// res.render('index', {threads: result, nav: req.session[user].nav, subnav: req.session[user].subnav, user: username, sub: req.params.subdomain_name});
-			res.json({threads: result});
+		client.query(FIND_ALL_DOMAINS, [], function(err, ALL_DOMAINS) {
+			client.query(FIND_ALL_SUBDOMAINS, [], function(err, ALL_SUBDOMAINS) {
+				client.query(find_subdomain_threads, [req.params.subdomain_name], function(err, subdomain_threads) {
+					client.release();
+					res.json({ALL_DOMAINS, ALL_SUBDOMAINS, subdomain_threads});
+				});
+			});
 		});
 	});
 });
 
-router.get('/NYU/createSub', function(req, res) {
-	if (!req.session.hasOwnProperty(req.params.user)) {
-		res.redirect('/');
-	}
-	var user = req.params.user;
-	res.render('createSub', {user: user})
-})
+router.post('/NYU/:subdomain_name', function(req, res) {
+	var find_subdomain_threads = 'SELECT * FROM domain NATURAL JOIN subdomain NATURAL JOIN thread NATURAL JOIN file WHERE subdomain_name = ? ORDER BY points DESC';
+	pool.getConnection(function(err, client, done) {
+		client.query(find_subdomain_threads, [req.params.subdomain_name], function(err, subdomain_threads) {
+			client.release();
+			res.json({subdomain_threads});
+		});
+	});
+});
+
+
+
 
 router.post('/NYU/createSub', function(req, res) {
-	
 	//The LAST_INSERT_ID() function only returns the most recent autoincremented id value for the most recent INSERT operation, to any table, on your MySQL connection.
 	
-	if (!req.session.hasOwnProperty(req.params.user)) {
-		res.redirect('/');
-	}
-	var createSub = 'INSERT INTO subdomain (name, domain_id) VALUES(?, 1)';
-	var userSub = 'INSERT INTO subdomain_user VALUES(LAST_INSERT_ID(), ?, true)';
-	var findSubDomains = 'SELECT name, id from subdomain_user as perm JOIN subdomain as dom ON(perm.subdomain_id = dom.id) WHERE username = ?';
+	var create_subdomain = 'INSERT INTO subdomain (subdomain_name, domain_id) VALUES(?, 1)';
+	var insert_user_subdomain = 'INSERT INTO subdomain_user (subdomain_id, username, subdomain_moderator) VALUES(LAST_INSERT_ID(), ?, true)';
+	var find_user_subdomains_in = 'SELECT * FROM subdomain_user NATURAL JOIN subdomain NATURAL JOIN domain_user NATURAL JOIN domain WHERE username = ?'
 	
 	pool.getConnection(function(err, client, done) {
-		client.query(createSub, [req.body.subName], function(err, result) {
-			client.query(userSub, [req.params.user], function(err, result) { // changed result[0].id to LAST_INSERT_ID;
-				client.query(findSubDomains, [req.params.user], function(err, result) {
+		client.query(create_subdomain, [req.body.subdomain_name], function(err, result) {
+			client.query(insert_user_subdomain, [req.body.username], function(err, result) { // changed result[0].id to LAST_INSERT_ID;
+				client.query(find_user_subdomains_in, [req.body.username], function(err, result) {
 					client.release();
-					req.session[req.params.user].subnav = result;
-					res.redirect('/');
+					res.json(result);
 				})
 			});
 		})

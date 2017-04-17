@@ -1,7 +1,7 @@
-var express = require('express');
-var bcrypt = require('bcryptjs');
 var request = require('request');
+var express = require('express');
 var router = express.Router();
+var bcrypt = require('bcryptjs');
 
 var defaultSub = {
 	All: 0,
@@ -12,33 +12,36 @@ var defaultSub = {
 }
 
 router.get('/', function(req, res) { // session: get user_domains, user_subdomains, index: user_subdomains_not_in, user_threads
-	console.log("req.sessionID:", req.sessionID);
-	console.log("req.session:", req.session);
-	console.log("req.cookies:", req.cookies); // saved
-	console.log("req.session.cookie:", req.session.cookie);
-	console.log("req.session['username']:", req.session['username']);
-	console.log("req.session['data']:", req.session['data']);
+	console.log("req.session.data:", req.session.data);
 
-	if (req.session['data'] == null) {
-
-		var logged = false;
+	if (req.session.data == null) {
 		request.get({
     		url: 'http://localhost:3000',
     		json: true
 		}, function(error, response, body) {
-			console.log("response.body:", response.body);
-			res.render('index', {nav: response.body.ALL_DOMAINS, subnav: response.body.ALL_SUBDOMAINS, subs: response.body.ALL_SUBDOMAINS, threads: response.body.ALL_THREADS, logged: logged});
+			// console.log("response.body:", response.body);
+			res.render('index', {
+				nav: response.body.ALL_DOMAINS, 
+				subnav: response.body.ALL_SUBDOMAINS, 
+				join_subs: response.body.ALL_SUBDOMAINS, 
+				threads: response.body.ALL_THREADS, 
+				logged: false});
 		});
 	}
 
-	else if (req.session['data'] != null) {
-		var logged = true;
+	else if (req.session.data != null) {
 		request.post({
     		url: 'http://localhost:3000',
     		json: true,
-    		form: {username: req.session['data'].username}
+    		form: {username: req.session.data.username}
 		}, function(error, response, body) { // user_threads, user_subdomains_not_in initialized and retrieved
-			res.render('index', {nav: req.session['data'].user_domains, subnav: req.session['data'].user_subdomains, subs: response.body.user_subdomains_not_in, threads: response.body.user_threads, logged: logged});
+			// console.log("response.body:", response.body);
+			res.render('index', {
+				nav: req.session.data.user_domains_in, 
+				subnav: req.session.data.user_subdomains_in, 
+				join_subs: response.body.user_subdomains_not_in, 
+				threads: response.body.user_threads_in, 
+				logged: true});
 		});
 	}
 });
@@ -54,10 +57,9 @@ router.get('/register', function(req, res) {
 router.post('/register', function(req, res) {
 	request.post({
     	url: 'http://localhost:3000/register',
-    	form: {username: req.body.username, 
-    		password: req.body.password,
-    		first_name: req.body.first_name,
-    		last_name: req.body.last_name
+    	form: {
+    		username: req.body.username, 
+    		password: req.body.password
     	}
 	}, function(error, response, body) {
 		console.log(response.body);
@@ -73,7 +75,9 @@ router.post('/login', function(req, res) {
 	request.post({
     	url: 'http://localhost:3000/login',
     	json: true,
-    	form: {"username": req.body.username, "password": req.body.password}
+    	form: {
+    		"username": req.body.username, 
+    		"password": req.body.password}
 	}, function(error, response, body) {
 		req.session.data = response.body; // user_domains and user_subdomains initialized and retrieved
 		res.redirect("/");

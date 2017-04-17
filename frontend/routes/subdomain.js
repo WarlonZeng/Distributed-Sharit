@@ -1,31 +1,53 @@
+var request = require('request');
 var express = require('express');
 var router = express.Router();
 
-router.get('/:domain_name/:subdomain_name', function(req, res) {
-	request.get({
-    	url: 'http://localhost:3000/' + req.params.domain_name + req.params.subdomain_name,
-    	json: true
-	}, function(error, response, body) {
-		console.log("response.body:", response.body);
-		res.render('index', {nav: req.session.data, subnav: response.body.ALL_SUBDOMAINS, subs: response.body.ALL_SUBDOMAINS, threads: response.body.ALL_THREADS, logged: logged});
-	});
+// currently fixed for NYU.. support for more domains can be considered via /d/
+
+router.get('/NYU/:subdomain_name', function(req, res) {
+	var url_name = 'http://localhost:3000/NYU/' + req.params.subdomain_name;
+
+	if (req.session.data == null) {
+	    request.get({
+	        url: url_name,
+	        json: true
+	    }, function(error, response, body) {
+	        res.render('view_subdomain', {
+				nav: response.body.ALL_DOMAINS, 
+				subnav: response.body.ALL_SUBDOMAINS,
+	            threads: response.body.subdomain_threads,
+	            subdomain_name: req.params.subdomain_name,
+	            logged: false
+	        });
+	    });
+	}
+
+	if (req.session.data != null) {
+	    request.post({
+	        url: url_name,
+	        json: true
+	    }, function(error, response, body) {
+	        res.render('view_subdomain', {
+	            nav: req.session.data.user_domains_in,
+	            subnav: req.session.data.user_subdomains_in,
+	            threads: response.body.subdomain_threads,
+	            subdomain_name: req.params.subdomain_name,
+	            logged: true
+	        });
+	    });
+	}
 });
 
-router.get('/NYU/createSub', function(req, res) {
-	if (!req.session.hasOwnProperty(req.params.user)) {
-		res.redirect('/');
+router.get('/create_subdomain', function(req, res) {
+	if (req.session.data == null) {
+		res.redirect('/login');
 	}
-	var user = req.params.user;
-	res.render('createSub', {user: user})
+	res.render('create_subdomain');
 })
 
-router.post('/NYU/createSub', function(req, res) {
-	
+router.post('/create_subdomain', function(req, res) {
 	//The LAST_INSERT_ID() function only returns the most recent autoincremented id value for the most recent INSERT operation, to any table, on your MySQL connection.
-	
-	if (!req.session.hasOwnProperty(req.params.user)) {
-		res.redirect('/');
-	}
+
 	var createSub = 'INSERT INTO subdomain (name, domain_id) VALUES(?, 1)';
 	var userSub = 'INSERT INTO subdomain_user VALUES(LAST_INSERT_ID(), ?, true)';
 	var findSubDomains = 'SELECT name, id from subdomain_user as perm JOIN subdomain as dom ON(perm.subdomain_id = dom.id) WHERE username = ?';

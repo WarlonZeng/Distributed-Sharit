@@ -10,7 +10,7 @@ var session = require('express-session');
 var redisStore = require('connect-redis')(session);
 
 var index = require('./routes/index');
-var subDom = require('./routes/subdomain');
+var subdomain = require('./routes/subdomain');
 var thread = require('./routes/thread');
 var comment = require('./routes/comment');
 
@@ -43,7 +43,7 @@ var sessionOptions = {
 app.use(session(sessionOptions));
 
 app.use('/', index);
-app.use('/', subDom);
+app.use('/', subdomain);
 app.use('/', thread);
 app.use('/', comment);
 

@@ -1,7 +1,6 @@
 <div class="row">
 	<div class="col-md-3 col-md-offset-1">
 		<br><br><br>
-		<a href="/NYU/createSub"><button class="btn btn-success">Create Subdomain</button></a><br><br>
 
 		{{#if logged}}
 		<a href="/logout"><button class="btn btn-danger">Logout</button></a><br><br>
@@ -10,12 +9,13 @@
 		<a href="/register"><button class="btn btn-danger">Register</button></a><br><br>
 		{{/if}}
 
+		<a href="/create_subdomain"><button class="btn btn-success">Create Subdomain</button></a><br><br>
 
 		<div class="dropdown">
 			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Join Subdomain
 				<span class="caret"></span></button>
 				<ul class="dropdown-menu">
-					{{#each subs}}
+					{{#each join_subs}}
 						<li><a href="/join_sub/{{subdomain_name}}">{{subdomain_name}}</a></li>
 					{{/each}}
 				</ul>
@@ -31,7 +31,7 @@
 					<input type="image" class="downVoteThread voteButts" info="/voteThread/{{thread_id}}/-1" id={{thread_id}} src="/images/down.png" /><br>
 				</div>
 				<div>
-					<h2><u><a href="/{{domain_name}}/{{subdomain_name}}">{{title}}</a><br></u></h2>
+					<h2><u><a href="/NYU/{{subdomain_name}}">{{title}}</a><br></u></h2>
 					<h4>{{context}}</h4>
 					<h5>Created by: <u>{{author}}</u> on {{date_posted}}</h5>
 					{{#if this.filename}}
