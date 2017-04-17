@@ -32,48 +32,37 @@ router.post('/NYU/:subdomain_name', function(req, res) {
 	});
 });
 
-
-
-
-router.post('/NYU/createSub', function(req, res) {
+router.post('/create_subdomain', function(req, res) {
 	//The LAST_INSERT_ID() function only returns the most recent autoincremented id value for the most recent INSERT operation, to any table, on your MySQL connection.
 	
-	var create_subdomain = 'INSERT INTO subdomain (subdomain_name, domain_id) VALUES(?, 1)';
-	var insert_user_subdomain = 'INSERT INTO subdomain_user (subdomain_id, username, subdomain_moderator) VALUES(LAST_INSERT_ID(), ?, true)';
-	var find_user_subdomains_in = 'SELECT * FROM subdomain_user NATURAL JOIN subdomain NATURAL JOIN domain_user NATURAL JOIN domain WHERE username = ?'
+	var create_subdomain_and_join_it = 'INSERT INTO subdomain (subdomain_name, domain_id) VALUES(?, 1); INSERT INTO subdomain_user (subdomain_id, username, subdomain_moderator) VALUES(LAST_INSERT_ID(), ?, true);';
+	var find_user_subdomains_in = 'SELECT * FROM subdomain_user NATURAL JOIN subdomain NATURAL JOIN domain_user NATURAL JOIN domain WHERE username = ?';
 	
+	console.log(req.body.subdomain_name);
+	console.log(req.body.username);
+
 	pool.getConnection(function(err, client, done) {
-		client.query(create_subdomain, [req.body.subdomain_name], function(err, result) {
-			client.query(insert_user_subdomain, [req.body.username], function(err, result) { // changed result[0].id to LAST_INSERT_ID;
-				client.query(find_user_subdomains_in, [req.body.username], function(err, result) {
-					client.release();
-					res.json(result);
-				})
+		client.query(create_subdomain_and_join_it, [req.body.subdomain_name, req.body.username], function(err, result) {
+			if (err) console.log(err);
+			console.log(result);
+			client.query(find_user_subdomains_in, [req.body.username], function(err, result) {
+				client.release();
+				console.log(result);
+				res.json({user_subdomains_in: result});
 			});
-		})
+		});
 	});
 });
 
-router.get('/joinSub/:subid', function(req, res) {
-
-	if (req.session['username'] == null) {
-		res.redirect('/auth');
-	}
-
-	if (req.session['username'] != null) {
-		res.redirect('/auth');
-	}
-
-	var insertSub = 'insert into subdomain_user (id, name, domain_id) values(?, ?, false);';
-	var findSubDomains = 'SELECT name, id from subdomain_user as perm JOIN subdomain as dom ON(perm.subdomain_id = dom.id) WHERE username = ?';
+router.post('/join_subdomain', function(req, res) {
+	var insert_user_into_subdomain = 'INSERT INTO subdomain_user (subdomain_id, username, subdomain_moderator) SELECT subdomain_id, ?, true FROM subdomain WHERE subdomain_name = ?'
+	var find_user_subdomains_in = 'SELECT * FROM subdomain_user NATURAL JOIN subdomain NATURAL JOIN domain_user NATURAL JOIN domain WHERE username = ?';
 	
 	pool.getConnection(function(err, client, done) {
-		client.query(insertSub, [req.params.subid, req.params.user], function(err, result) {
-			client.query(findSubDomains, [req.params.user], function(err, result) {
+		client.query(insert_user_into_subdomain, [req.body.username, req.body.subdomain_name], function(err, result) {
+			client.query(find_user_subdomains_in, [req.body.username], function(err, result) {
 				client.release();
-				req.session[req.session['username']].subnav = result;
-				// res.redirect('/');
-				res.json({subnav: req.session[req.session['username']].subnav});
+				res.json({user_subdomains_in: result});
 			});
 		});
 	});
