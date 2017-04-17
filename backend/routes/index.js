@@ -32,8 +32,7 @@ router.get('/', function(req, res) { // General domains and subdomains
 
 router.post('/', function(req, res) { // User specific domains and subdomains
 	var find_user_subdomain_not_in = 'SELECT subdomain_name FROM subdomain WHERE subdomain_id NOT IN (SELECT subdomain_id FROM subdomain_user WHERE username = ?) ORDER BY subdomain_name';
-	// var find_user_threads_in = 'SELECT thread.subdomain_id, username, thread.thread_id, author, date_posted, title, context, points, subdomain.subdomain_name, filename FROM (subdomain_user NATURAL JOIN thread NATURAL JOIN file) JOIN subdomain ON (thread.subdomain_id = subdomain.subdomain_id) WHERE username = ? ORDER BY points DESC, date_posted DESC'
-	var find_user_threads_in = 'SELECT * FROM subdomain_user NATURAL JOIN domain_user NATURAL JOIN thread NATURAL JOIN file NATURAL JOIN subdomain NATURAL JOIN domain WHERE username = ? ORDER BY points DESC, date_posted DESC '
+	var find_user_threads_in = 'SELECT * FROM subdomain_user NATURAL JOIN domain_user NATURAL JOIN thread NATURAL JOIN file NATURAL JOIN subdomain NATURAL JOIN domain WHERE username = ? ORDER BY thread_points DESC, date_posted DESC '
 	
 	pool.getConnection(function(err, client, done) {
 		client.query(find_user_subdomain_not_in, [req.body.username], function(err, user_subdomains_not_in) {

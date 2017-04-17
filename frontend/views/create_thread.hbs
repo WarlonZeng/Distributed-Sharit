@@ -3,20 +3,20 @@
 		<div class="col-md-4 col-md-offset-4">
 			<div class="jumbotron">
 
-				<form method="POST" action="/NYU/{{sub}}/{{subid}}/{{user}}/createThread" enctype="multipart/form-data">
+				<form method="POST" action="/create_thread/:subdomain_name" enctype="multipart/form-data">
 					<div class="form-group">
 
-						<label for="title">title</label>
+						<label for="title">Title</label>
 						<input type="text" name="title" class="form-control"  required />
 
-						<label for="context">context</label>
+						<label for="context">Context</label>
 						<input type="text" name="context" class="form-control"  required />
 
-						<label for="file">somefile</label>
+						<label for="file">File</label>
 						<input type="file" name="file" class="form-control"  />
 						<br></br>
 
-						<input type="submit" class="btn btn-primary" value="createThread" />
+						<input type="submit" class="btn btn-primary" value="Create" />
 					</div>
 				</form>
 			</div>

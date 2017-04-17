@@ -1,17 +1,28 @@
+{{#if logged}}
+<a href="/logout"><button class="btn btn-danger">Logout</button></a><br><br>
+{{else}}
+<a href="/login"><button class="btn btn-danger">Login</button></a>
+<a href="/register"><button class="btn btn-danger">Register</button></a><br><br>
+{{/if}}
+		
+<a href="/create_thread/{{subdomain_name}}"><button class="btn btn-success">Create Thread</button></a><br><br>
+
+<a href="/join_sub/{{subdomain_name}}"><button class="btn btn-primary">Join Sub</button></a>
+
 <div class="row">
 	<div class="col-md-6 col-md-offset-3">
 		<div class="jumbotron">
 			<div class="votes">
-				<input type="image" class="upVoteThread voteButts" info="/voteThread/{{user}}/{{thread.id}}/1" id={{thread.id}} src="/images/up.png" /><br>
-				<span>{{thread.points}}</span><br>
-				<input type="image" class="downVoteThread" info="/voteThread/{{user}}/{{thread.id}}/-1" id={{thread.id}} src="/images/down.png" class="voteButts" /><br>
+				<input type="image" class="upVoteThread voteButts" info="/vote_thread/{{thread.thread_id}}/1" id={{thread.thread_id}} src="/images/up.png" /><br>
+				<span>{{thread.thread_points}}</span><br>
+				<input type="image" class="downVoteThread voteButts" info="/vote_thread/{{thread.thread_id}}/-1" id={{thread.thread_id}} src="/images/down.png" /><br>
 			</div>
 			<div>
 				<h2>{{thread.title}}<br></h2>
 				<h4>{{thread.context}}</h4>
 				<h5>Created by: <u>{{thread.author}}</u> on {{thread.date_posted}}</h5>
 				{{#if filename}}
-				Attached File: <a href="/downloadFile/{{thread.id}}" target="_blank">{{filename.filename}}</a>
+				Attached File: <a href="/downloadFile/{{thread_id}}" target="_blank">{{filename.filename}}</a>
 				{{/if}}
 			</div>
 		</div><br>
@@ -21,7 +32,7 @@
 <form method="POST" action="/NYU/{{sub}}/{{subid}}/{{user}}/{{thread_id}}">
 	<div class="form-group">
 		<textarea rows="10" cols="50" placeholder="Comment Here" name="comment" required></textarea><br>
-		<input type="submit" class="btn btn-primary" value="Comment" />
+		<input type="submit" class="btn btn-primary" value="Post" />
 	</div>
 </form>
 
@@ -29,9 +40,9 @@
 	<hr>
 	<div class="comments">
 		<div class="votes">
-			<input type="image" class="upVoteCom comButts" info="/voteComment/{{../user}}/{{id}}/1" id={{id}} src="/images/up.png" /><br>
-			<span>{{points}}</span><br>
-			<input type="image" class="downVoteCom comButts" info="/voteComment/{{../user}}/{{id}}/-1" id={{id}} src="/images/down.png" /><br>
+			<input type="image" class="upVoteCom comButts" info="/vote_comment/{{comment_id}}/1" id={{comment_id}} src="/images/up.png" /><br>
+			<span>{{comment_points}}</span><br>
+			<input type="image" class="downVoteCom comButts" info="/vote_comment/{{comment_id}}/-1" id={{comment_id}} src="/images/down.png" /><br>
 		</div>
 		<div class="comment-info">
 			<h3>{{comment}}</h3>
