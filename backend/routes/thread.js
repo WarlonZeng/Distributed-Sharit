@@ -40,48 +40,29 @@ router.get('/NYU/:subdomain_name/:thread_id', function(req, res) {
 });
 
 
-// router.get('/NYU/:sub/:subid/:user/createThread', function(req, res) {
-// 	if(!req.session.hasOwnProperty(req.params.user)) {
-// 		res.redirect('/');
-// 	}
-// 	var user = req.params.user;
-// 	res.render('createThread', {nav: req.session[user].nav, subnav: req.session[user].subnav, user: user, subid: req.params.subid, sub: req.params.sub});
-// });
-
 // router.post('/NYU/:sub/:subid/:user/createThread', upload.single('file'), function(req, res) {
-// 	if(!req.session.hasOwnProperty(req.params.user)) {
-// 		res.redirect('/');
-// 	}
+router.post('/create_thread/NYU/:subdomain_name', function(req, res) {
+	console.log("req.body: ", req.body);
 
-// 	var createThread;
-// 	var linkFileToThread = 'INSERT INTO file (thread_id) VALUES (LAST_INSERT_ID());'
-
-// 	pool.getConnection(function(err, client, done) {
-// 		if (!req.file) { // no file
-// 			createThread = 'INSERT INTO thread (subdomain_id, title, author, context) VALUES(?, ?, ?, ?);'; 
-// 			client.query(createThread, [req.params.subid, req.body.title, req.params.user, req.body.context], function(err, result) {
-// 				client.query(linkFileToThread, [], function(err, result) {
-// 					if (err)
-// 						console.log(err);
-// 					client.release();
-// 					res.redirect('/NYU/' + req.params.sub + '/' + req.params.subid + '/' + req.params.user);
-// 				})
-// 			});
-// 		}
-// 		else { // there is file
-// 			if (err) console.log(err);
-// 			createThread = 'INSERT INTO thread (subdomain_id, title, author, context) VALUES(?, ?, ?, ?);';
-// 			client.query(createThread, [req.params.subid, req.body.title, req.params.user, req.body.context, req.file.originalname, req.file.filename], function(err, result) {
-// 				client.query(linkFileToThread, [], function(err, result) {
-// 					if (err) 
-// 					console.log(err);
-// 					client.release();
-// 					res.redirect('/NYU/' + req.params.sub + '/' + req.params.subid + '/' + req.params.user);
-// 				});
-// 			});
-// 		}
-// 	});
-// });
+	pool.getConnection(function(err, client, done) {
+		if (!req.body.file) { // no file
+			var create_thread = 'INSERT INTO thread (subdomain_id, title, author, context) ' + 
+			'SELECT subdomain_id, ?, ?, ? FROM subdomain WHERE subdomain_name = ?; INSERT INTO file (thread_id) VALUES (LAST_INSERT_ID());'; 
+			client.query(create_thread, [req.body.title, req.body.username, req.body.context, req.body.subdomain_name], function(err, result) {
+				if (err) console.log(err);
+				res.json("OK");
+			});
+		}
+		else if (req.body.file) { // there is file
+			var create_thread = 'INSERT INTO thread (subdomain_id, title, author, context) ' + 
+			'SELECT subdomain_id, ?, ?, ? FROM subdomain WHERE subdomain_name = ?; INSERT INTO file (thread_id) VALUES (LAST_INSERT_ID());'; 
+			client.query(create_thread, [req.body.title, req.body.username, req.body.context, req.body.subdomain_name], function(err, result) {
+				if (err) console.log(err);
+				res.json("OK");
+			});
+		}
+	});
+});
 
 // router.get('/downloadFile/:thread_id', function(req, res){
 // 	var downloadFile = 'SELECT filename, data FROM file WHERE thread_id = ?';

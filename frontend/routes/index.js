@@ -29,7 +29,7 @@ router.get('/', function(req, res) { // session: get user_domains, user_subdomai
 		});
 	}
 
-	if (req.session.data != null) {
+	else if (req.session.data != null) {
 		request.post({
     		url: 'http://localhost:3000',
     		json: true,

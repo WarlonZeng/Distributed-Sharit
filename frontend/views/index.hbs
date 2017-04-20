@@ -9,14 +9,14 @@
 		<a href="/register"><button class="btn btn-danger">Register</button></a><br><br>
 		{{/if}}
 
-		<a href="/NYU/create_subdomain"><button class="btn btn-success">Create Subdomain</button></a><br><br>
+		<a href="/create_subdomain/NYU"><button class="btn btn-success">Create Subdomain</button></a><br><br>
 
 		<div class="dropdown">
 			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Join Subdomain
 				<span class="caret"></span></button>
 				<ul class="dropdown-menu">
 					{{#each join_subs}}
-						<li><a href="/NYU/join_subdomain/{{subdomain_name}}">{{subdomain_name}}</a></li>
+						<li><a href="/join_subdomain/NYU/{{subdomain_name}}">{{subdomain_name}}</a></li>
 					{{/each}}
 				</ul>
 			</div>

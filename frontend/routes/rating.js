@@ -1,20 +1,20 @@
+var request = require('request');
 var express = require('express');
-
 var router = express.Router();
-var mysql = require('mysql');
-var configDB = require('../config/dbconfig.js');
-var pool = new mysql.createPool(configDB);
 
-function getPoints(client, id, res, done, query) {
-	client.query(query, [id], function(err, result) {
-		res.json(result[0]);
-	})
-}
+// function getPoints(client, id, res, done, query) {
+// 	client.query(query, [id], function(err, result) {
+// 		res.json(result[0]);
+// 	})
+// }
 
-router.get('/voteThread/:user/:thread_id/:rating', function(req, res){
-	if(! req.session.hasOwnProperty(req.params.user)){
-		res.redirect('/');
+router.get('/vote_thread/:thread_id/:rating', function(req, res){
+	if (req.session.data == null) {
+		res.redirect('/login');
 	}
+
+	// var update_thread_points = 
+
 	var queryFind = 'SELECT username FROM thread_ratings WHERE thread_id = ? and username = ?';
 	var voteThread = 'INSERT INTO thread_ratings (thread_id, username, rating) VALUES(?, ?, ?)';
 	var updateVote = 'UPDATE thread_ratings SET rating = ? WHERE thread_id = ? and username = ?';

@@ -12,75 +12,51 @@ router.get('/NYU/:subdomain_name/:thread_id', function(req, res) {
 	    url: 'http://localhost:3000/NYU/' + req.params.subdomain_name + '/' + req.params.thread_id,
 	    json: true
 	}, function(error, response, body) {
-		if (req.session.data == null) {
-			res.render('view_thread', {
-				nav: response.body.ALL_DOMAINS, 
-				subnav: response.body.ALL_SUBDOMAINS,
-	    		thread: response.body.thread[0],
-	    		comments: response.body.comments,
-	    		filename: response.body.filename[0],
-	    		subdomain_name: req.params.subdomain_name,
-	    		logged: false
-	    	});
-		}
-	    
-		if (req.session.data != null) {
-	        res.render('view_thread', {
-				nav: req.session.data.user_domains_in, 
-				subnav: req.session.data.user_subdomains_in,
-	    		thread: response.body.thread[0],
-	    		comments: response.body.comments,
-	    		filename: response.body.filename[0],
-	    		subdomain_name: req.params.subdomain_name,
-	    		logged: true
-	    	});
-		}
+		res.render('view_thread', {
+			nav: response.body.ALL_DOMAINS, 
+			subnav: response.body.ALL_SUBDOMAINS,
+	    	thread: response.body.thread[0],
+	    	comments: response.body.comments,
+	    	filename: response.body.filename[0],
+	    	subdomain_name: req.params.subdomain_name,
+	    	logged: false
+	    });
 	});
 });
 
-router.get('/NYU/create_thread/:subdomain_name', function(req, res) {
+router.get('/create_thread/NYU/:subdomain_name', function(req, res) {
 	if (req.session.data == null) {
-		res.redirect('/');
+		return res.redirect('/login');
 	}
-	res.render('create_thread');
+	res.render('create_thread', {subdomain_name: req.params.subdomain_name});
 });
 
-router.post('/NYU/create_thread/:subdomain_name', upload.single('file'), function(req, res) {
-	if (req.session.data != null) {
+// router.post('/create_thread/NYU/:subdomain_name', upload.single('file'), function(req, res) {
+router.post('/create_thread/NYU/:subdomain_name', function(req, res) { // get back to this for file
 
-	}
+	console.log("req.body: ", req.body);
+	console.log("req.params.subdomain_name: ", req.params.subdomain_name);
+	console.log("req.file: ", req.file);
 
-	var createThread;
-	var linkFileToThread = 'INSERT INTO file (thread_id) VALUES (LAST_INSERT_ID());'
+    if (req.session.data != null) {
 
-	pool.getConnection(function(err, client, done) {
-		if (!req.file) { // no file
-			createThread = 'INSERT INTO thread (subdomain_id, title, author, context) VALUES(?, ?, ?, ?);'; 
-			client.query(createThread, [req.params.subid, req.body.title, req.params.user, req.body.context], function(err, result) {
-				client.query(linkFileToThread, [], function(err, result) {
-					if (err)
-						console.log(err);
-					client.release();
-					res.redirect('/NYU/' + req.params.sub + '/' + req.params.subid + '/' + req.params.user);
-				})
-			});
-		}
-		else { // there is file
-			if (err) console.log(err);
-			createThread = 'INSERT INTO thread (subdomain_id, title, author, context) VALUES(?, ?, ?, ?);';
-			client.query(createThread, [req.params.subid, req.body.title, req.params.user, req.body.context, req.file.originalname, req.file.filename], function(err, result) {
-				client.query(linkFileToThread, [], function(err, result) {
-					if (err) 
-					console.log(err);
-					client.release();
-					res.redirect('/NYU/' + req.params.sub + '/' + req.params.subid + '/' + req.params.user);
-				});
-			});
-		}
-	});
+        request.post({
+            url: 'http://localhost:3000/create_thread/NYU/' + req.params.subdomain_name,
+            json: true,
+            form: {
+                title: req.body.title,
+                context: req.body.context,
+                subdomain_name: req.params.subdomain_name,
+                username: req.session.data.username,
+                file: req.file
+            }
+        }, function(error, response, body) {
+        	res.redirect('/NYU/' + req.params.subdomain_name);
+        });
+    }
 });
 
-router.get('/downloadFile/:thread_id', function(req, res){
+router.get('/downloadFile/:thread_id', function(req, res) { // get get back to thsi for file
 	var downloadFile = 'SELECT filename, data FROM file WHERE thread_id = ?';
 
 	pool.getConnection(function(err, client, done){
