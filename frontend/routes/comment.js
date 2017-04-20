@@ -23,7 +23,7 @@ router.post('/create_comment/NYU/:subdomain_name/:thread_id', function(req, res)
             	comment: req.body.comment
             }
         }, function(error, response, body) {
-        	res.redirect('/NYU/' + req.params.subdomain_name);
+        	res.redirect('/NYU/' + req.params.subdomain_name + '/' + req.params.thread_id);
         });
     }
 });

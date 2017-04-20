@@ -46,10 +46,6 @@ router.get('/', function(req, res) { // session: get user_domains, user_subdomai
 	}
 });
 
-router.get('/auth', function(req, res) {
-	res.render('auth');
-});
-
 router.get('/register', function(req, res) {
 	res.render('register');
 });

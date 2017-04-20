@@ -6,14 +6,11 @@ var configDB = require('../config/dbconfig.js');
 var pool = new mysql.createPool(configDB);
 
 router.post('/create_comment/NYU', function(req, res) {
-	if(!req.session.hasOwnProperty(req.params.user)) {
-		res.redirect('/');
-	}
 	var create_comment = 'INSERT into comment(thread_id, author, comment) VALUES (?, ?, ?)';
 	pool.getConnection(function(err, client) {
 		client.query(create_comment, [req.body.thread_id, req.body.username, req.body.comment], function(err, result) {
 			client.release();
-			res.json(result);
+			res.json("OK");
 		});
 	});
 });
