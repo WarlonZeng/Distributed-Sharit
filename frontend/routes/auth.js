@@ -17,16 +17,34 @@ router.get('/register', function(req, res) {
 });
 
 router.post('/register', function(req, res) {
-	request.post({
-    	url: 'http://localhost:3000/register',
-    	form: {
-    		username: req.body.username, 
-    		password: req.body.password
-    	}
-	}, function(error, response, body) {
-		console.log(response.body);
-		res.redirect("/login");
-	});
+    request.post({
+        url: 'http://localhost:3000/register',
+        json: true,
+        form: {
+            username: req.body.username,
+            password: req.body.password
+        }
+    }, function(error, response, body) {
+        console.log(response.body);
+        // res.redirect("/login");
+        if (response.body == "OK") {
+            request.post({
+                url: 'http://localhost:3000/login',
+                json: true,
+                form: {
+                    username: req.body.username,
+                    password: req.body.password
+                }
+            }, function(error, response, body) {
+            	console.log("response.body: ", response.body);
+                req.session.data = response.body; // user_domains and user_subdomains initialized and retrieved
+                res.redirect("/");
+            });
+        } 
+        else if (response.body != "OK") {
+            res.redirect('/');
+        }
+    });
 });
 
 router.get('/login', function(req, res){
@@ -38,8 +56,8 @@ router.post('/login', function(req, res) {
     	url: 'http://localhost:3000/login',
     	json: true,
     	form: {
-    		"username": req.body.username, 
-    		"password": req.body.password}
+    		username: req.body.username, 
+    		password: req.body.password}
 	}, function(error, response, body) {
 		req.session.data = response.body; // user_domains and user_subdomains initialized and retrieved
 		res.redirect("/");

@@ -27,6 +27,33 @@ router.get('/NYU/:subdomain_name', function(req, res) { // get all new fresh thr
 	});
 });
 
+router.post('/NYU/:subdomain_name', function(req, res) { // get all new fresh threads
+    var FIND_SUBDOMAIN_THREADS = 'SELECT * FROM domain NATURAL JOIN subdomain NATURAL JOIN thread NATURAL JOIN file WHERE subdomain_name = ? ORDER BY thread_points DESC';
+    var find_user_joined_subdomain = 'SELECT * FROM subdomain_user NATURAL JOIN subdomain WHERE username = ? AND subdomain_name = ?';
+
+    pool.getConnection(function(err, client, done) {
+        client.query(FIND_SUBDOMAIN_THREADS, [req.params.subdomain_name], function(err, subdomain_threads) {
+            client.query(find_user_joined_subdomain, [req.body.username, req.params.subdomain_name], function(err, joined) {
+                if (joined.length != 0) {
+                    client.release();
+                    res.json({
+                        subdomain_threads,
+                        joined: true
+                    });
+                } 
+                else {
+                    client.release();
+                    res.json({
+                        subdomain_threads,
+                        joined: false
+                    });
+                }
+            });
+        });
+    });
+});
+
+
 // REQUIRES:
 // subdomain_name
 // username

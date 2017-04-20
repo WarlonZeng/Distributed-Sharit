@@ -12,11 +12,11 @@
 		<a href="/create_subdomain/NYU"><button class="btn btn-success">Create Subdomain</button></a><br><br>
 
 		<div class="dropdown">
-			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Join Subdomain
+			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Check out subdomains
 				<span class="caret"></span></button>
 				<ul class="dropdown-menu">
-					{{#each join_subs}}
-						<li><a href="/join_subdomain/NYU/{{subdomain_name}}">{{subdomain_name}}</a></li>
+					{{#each check_subdomains}}
+						<li><a href="/NYU/{{subdomain_name}}">{{subdomain_name}}</a></li>
 					{{/each}}
 				</ul>
 			</div>

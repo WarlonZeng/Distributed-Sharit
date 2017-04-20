@@ -12,35 +12,41 @@ var router = express.Router();
 // thread_id
 // username
 router.get('/NYU/:subdomain_name/:thread_id', function(req, res) {
-	request.get({
-	    url: 'http://localhost:3000/NYU/' + req.params.subdomain_name + '/' + req.params.thread_id,
-	    json: true
-	}, function(error, response, body) {
-		if (req.session.data == null) {
-
-			res.render('view_thread', {
-				nav: response.body.ALL_DOMAINS, 
-				subnav: response.body.ALL_SUBDOMAINS,
-	    		thread: response.body.thread[0],
-	    		comments: response.body.comments,
-	    		filename: response.body.filename[0],
-	    		subdomain_name: req.params.subdomain_name,
-	    		logged: false
-	    	});
-		}
-
-	    else if (req.session.data != null) {
-			res.render('view_thread', {
-				nav: req.session.data.user_domains_in,
-				subnav: req.session.data.user_subdomains_in,
-	    		thread: response.body.thread[0],
-	    		comments: response.body.comments,
-	    		filename: response.body.filename[0],
-	    		subdomain_name: req.params.subdomain_name,
-	    		logged: true
-	    	});
-	    }
-	});
+    if (req.session.data == null) {
+        request.get({
+            url: 'http://localhost:3000/NYU/' + req.params.subdomain_name + '/' + req.params.thread_id,
+            json: true
+        }, function(error, response, body) {
+            res.render('view_thread', {
+                nav: response.body.ALL_DOMAINS,
+                subnav: response.body.ALL_SUBDOMAINS,
+                thread: response.body.thread[0],
+                comments: response.body.comments,
+                filename: response.body.filename[0],
+                subdomain_name: req.params.subdomain_name,
+                logged: false,
+                joined: false
+            });
+        });
+    } 
+    else if (req.session.data != null) {
+        request.post({
+            url: 'http://localhost:3000/NYU/' + req.params.subdomain_name + '/' + req.params.thread_id,
+            json: true,
+            form: {username: req.session.data.username}
+        }, function(error, response, body) {
+            res.render('view_thread', {
+                nav: req.session.data.user_domains_in,
+                subnav: req.session.data.user_subdomains_in,
+                thread: response.body.thread[0],
+                comments: response.body.comments,
+                filename: response.body.filename[0],
+                subdomain_name: req.params.subdomain_name,
+                logged: true,
+                joined: !(response.body.joined)
+            });
+        });
+    }
 });
 
 // REQUIRES:

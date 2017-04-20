@@ -43,6 +43,46 @@ router.get('/NYU/:subdomain_name/:thread_id', function(req, res) {
 	});
 });
 
+// REQUIRES:
+// subdomain_name
+// thread_id
+router.post('/NYU/:subdomain_name/:thread_id', function(req, res) {
+    var threads_info = 'SELECT * FROM thread WHERE thread_id = ?';
+    var thread_comments = 'SELECT * FROM comment WHERE thread_id = ? ORDER BY comment_points DESC, date_posted DESC';
+    var thread_file = 'SELECT filename FROM thread NATURAL JOIN file WHERE thread_id = ?';
+    var find_user_joined_subdomain = 'SELECT * FROM subdomain_user NATURAL JOIN subdomain WHERE username = ? AND subdomain_name = ?';
+
+    pool.getConnection(function(err, client, done) {
+        client.query(threads_info, [req.params.thread_id], function(err, thread) {
+            client.query(thread_comments, [req.params.thread_id], function(err, comments) {
+                client.query(thread_file, [req.params.thread_id], function(err, filename) {
+                    client.query(find_user_joined_subdomain, [req.body.username, req.params.subdomain_name], function(err, joined) {
+                        if (joined.length != 0) {
+                            client.release();
+                            res.json({
+	                            thread: thread,
+	                            comments: comments,
+	                            filename: filename,
+                                joined: true
+                            });
+                        } 
+                        else {
+                            client.release();
+                            res.json({
+	                            thread: thread,
+	                            comments: comments,
+	                            filename: filename,
+                                joined: false
+                            });
+                        }
+                    });
+                });
+            });
+        });
+    });
+});
+
+
 
 // router.post('/NYU/:sub/:subid/:user/createThread', upload.single('file'), function(req, res) {
 // REQUIRES: 

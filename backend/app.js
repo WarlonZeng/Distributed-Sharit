@@ -9,6 +9,7 @@ var redisClient  = redis.createClient();
 var session = require('express-session');
 var redisStore = require('connect-redis')(session);
 
+var auth = require('./routes/auth');
 var index = require('./routes/index');
 var subDom = require('./routes/subdomain');
 var thread = require('./routes/thread');
@@ -42,6 +43,7 @@ var sessionOptions = {
 
 app.use(session(sessionOptions));
 
+app.use('/', auth);
 app.use('/', index);
 app.use('/', subDom);
 app.use('/', thread);
