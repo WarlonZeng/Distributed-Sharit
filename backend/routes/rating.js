@@ -17,7 +17,7 @@ router.post('/vote_thread/NYU', function(req, res) {
 	pool.getConnection(function(err, client, done) {
 		client.query(update_thread_points, [req.body.thread_id, req.body.username, req.body.rating, req.body.rating, req.body.thread_id], function(err, result) {
 			client.query(find_thread_points, [req.body.thread_id], function(err, result) {
-				res.json(points: result[0]);	
+				res.json({points: result[0]});	
 			});
 		});
 	});
@@ -35,7 +35,7 @@ router.post('/vote_comment/NYU', function(req, res) {
 	pool.getConnection(function(err, client, done) {
 		client.query(update_comment_points, [req.body.comment_id, req.body.username, req.body.rating, req.body.rating, req.body.comment_id], function(err, result) {
 			client.query(find_comment_points, [req.body.comment_id], function(err, result) {
-				res.json(points: result[0]);		
+				res.json({points: result[0]});		
 			});
 		});
 	});
