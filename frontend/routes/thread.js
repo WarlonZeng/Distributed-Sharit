@@ -1,11 +1,16 @@
 var fs = require('fs');
 var multer = require('multer');
-var upload = multer({ dest: destStr })
-var destStr = 'uploads/';
+// var destStr = 'uploads/';
+var storage = multer.memoryStorage();
+// var upload = multer({ dest: destStr });
+var upload = multer({storage: storage});
 
 var request = require('request');
 var express = require('express');
 var router = express.Router();
+
+var cassandra = require('cassandra-driver');
+var client = new cassandra.Client({ contactPoints: ['172.31.54.227', '172.31.49.209', '172.31.60.212'], keyspace: 'sharit' });
 
 // REQUIRES:
 // subdomain_name
@@ -58,36 +63,59 @@ router.get('/create_thread/NYU/:subdomain_name', function(req, res) {
 	res.render('create_thread', {subdomain_name: req.params.subdomain_name});
 });
 
-// router.post('/create_thread/NYU/:subdomain_name', upload.single('file'), function(req, res) {
 // REQUIRES:
 // subdomain_name
 // username
 // title
 // context
 // file
-router.post('/create_thread/NYU/:subdomain_name', function(req, res) { // get back to this for file
-
-	console.log("req.body: ", req.body);
-	console.log("req.params.subdomain_name: ", req.params.subdomain_name);
-	console.log("req.file: ", req.file);
+// router.post('/create_thread/NYU/:subdomain_name', function(req, res) { // get back to this for file
+router.post('/create_thread/NYU/:subdomain_name', upload.single('file'), function(req, res) {
+    console.log("req.body: ", req.body);
+    console.log("req.params.subdomain_name: ", req.params.subdomain_name);
+    console.log("req.file: ", req.file);
 
     if (req.session.data != null) {
+        if (req.file) {
+            var insert_file_into_database = 'INSERT INTO file (filename, timestamp, file_data) VALUES (?, ?, ?)';
+            var timestamp = new Date().getTime();
 
-        request.post({
-            url: 'http://localhost:3000/create_thread/NYU',
-            json: true,
-            form: {
-            	username: req.session.data.username,
-            	subdomain_name: req.params.subdomain_name,
-                title: req.body.title,
-                context: req.body.context,
-                file: req.file
-            }
-        }, function(error, response, body) {
-        	res.redirect('/NYU/' + req.params.subdomain_name);
-        });
+            client.execute(insert_file_into_database, [req.file.originalname, timestamp, req.file.buffer], function(err, result) {
+                if (err) console.log(err);
+                request.post({
+                    url: 'http://localhost:3000/create_thread/NYU',
+                    json: true,
+                    form: {
+                        username: req.session.data.username,
+                        subdomain_name: req.params.subdomain_name,
+                        title: req.body.title,
+                        context: req.body.context,
+                        filename: req.file.originalname,
+                        timestamp: timestamp
+                    }
+                }, function(error, response, body) {
+                    res.redirect('/NYU/' + req.params.subdomain_name);
+                });
+            });
+        } else {
+            request.post({
+                url: 'http://localhost:3000/create_thread/NYU',
+                json: true,
+                form: {
+                    username: req.session.data.username,
+                    subdomain_name: req.params.subdomain_name,
+                    title: req.body.title,
+                    context: req.body.context,
+                    filename: null,
+                    timestamp: null
+                }
+            }, function(error, response, body) {
+                res.redirect('/NYU/' + req.params.subdomain_name);
+            });
+        }
     }
 });
+                    
 
 router.get('/downloadFile/:thread_id', function(req, res) { // get get back to thsi for file
 	var downloadFile = 'SELECT filename, data FROM file WHERE thread_id = ?';

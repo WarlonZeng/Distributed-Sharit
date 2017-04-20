@@ -193,3 +193,6 @@ A cluster holds many data centers and can replicate through all of them. Think o
 The data centers would be the west and east coasts. So far I only set up for each coast.
 Each data center can hold many racks. I only have one rack and it holds 3 servers. Rack may or may not incur a likely point of failure, the real point of redundancy is the servers.
 3 servers. 1 node each. This allows for horizontal replication to have multiple copies of the dataset across commodity machines.
+
+### 4/20/17
+Day before due date; 3 cassandra nodes, 3 mysql nodes, 3 backend nodes, 3 frontend nodes, 1 redis node. Frontend has connection to cassandra, mysql, and redis nodes. Deploying to AWS EC2 now.

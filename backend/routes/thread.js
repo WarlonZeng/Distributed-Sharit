@@ -93,7 +93,12 @@ router.post('/NYU/:subdomain_name/:thread_id', function(req, res) {
 // file
 router.post('/create_thread/NYU', function(req, res) {
 	pool.getConnection(function(err, client, done) {
-		if (!req.body.file) { // no file
+
+		console.log(req.body);
+		console.log(req.file);
+
+		if (!req.body.filename) { // no file
+			console.log('no file');
 			var create_thread = 'INSERT INTO thread (subdomain_id, title, author, context) ' + 
 			'SELECT subdomain_id, ?, ?, ? FROM subdomain WHERE subdomain_name = ?; INSERT INTO file (thread_id) VALUES (LAST_INSERT_ID());'; 
 			client.query(create_thread, [req.body.title, req.body.username, req.body.context, req.body.subdomain_name], function(err, result) {
@@ -101,10 +106,11 @@ router.post('/create_thread/NYU', function(req, res) {
 				res.json("OK");
 			});
 		}
-		else if (req.body.file) { // there is file
+		else if (req.body.filename) { // there is file
+			console.log('file received');
 			var create_thread = 'INSERT INTO thread (subdomain_id, title, author, context) ' + 
-			'SELECT subdomain_id, ?, ?, ? FROM subdomain WHERE subdomain_name = ?; INSERT INTO file (thread_id) VALUES (LAST_INSERT_ID());'; 
-			client.query(create_thread, [req.body.title, req.body.username, req.body.context, req.body.subdomain_name], function(err, result) {
+			'SELECT subdomain_id, ?, ?, ? FROM subdomain WHERE subdomain_name = ?; INSERT INTO file (thread_id, filename, timestamp) VALUES (LAST_INSERT_ID(), ?, ?);'; 
+			client.query(create_thread, [req.body.title, req.body.username, req.body.context, req.body.subdomain_name, req.body.filename, req.body.timestamp], function(err, result) {
 				if (err) console.log(err);
 				res.json("OK");
 			});
