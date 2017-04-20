@@ -2,6 +2,8 @@ var request = require('request');
 var express = require('express');
 var router = express.Router();
 
+var api = 'http://api.distributed-sharit.warloncs.net';
+
 var defaultSub = {
 	All: 0,
 	Bio: 1,
@@ -15,7 +17,7 @@ router.get('/', function(req, res) { // session: get user_domains, user_subdomai
 
 	if (req.session.data == null) {
 		request.get({
-    		url: 'http://localhost:3000',
+    		url: api,
     		json: true
 		}, function(error, response, body) {
 			// console.log("response.body:", response.body);
@@ -30,7 +32,7 @@ router.get('/', function(req, res) { // session: get user_domains, user_subdomai
 
 	else if (req.session.data != null) {
 		request.post({
-    		url: 'http://localhost:3000',
+    		url: api,
     		json: true,
     		form: {username: req.session.data.username}
 		}, function(error, response, body) { // user_threads, user_subdomains_not_in initialized and retrieved
@@ -50,7 +52,7 @@ router.get('/NYU', function(req, res) { // session: get user_domains, user_subdo
 
 	if (req.session.data == null) {
 		request.get({
-    		url: 'http://localhost:3000',
+    		url: api,
     		json: true
 		}, function(error, response, body) {
 			// console.log("response.body:", response.body);
@@ -65,7 +67,7 @@ router.get('/NYU', function(req, res) { // session: get user_domains, user_subdo
 
 	else if (req.session.data != null) {
 		request.post({
-    		url: 'http://localhost:3000',
+    		url: api,
     		json: true,
     		form: {username: req.session.data.username}
 		}, function(error, response, body) { // user_threads, user_subdomains_not_in initialized and retrieved

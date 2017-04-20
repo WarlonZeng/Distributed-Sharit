@@ -130,7 +130,7 @@ mysqldump -uroot --all-databases -p --master-data > sharit.sql
 ```git
 change master to master_host='172.31.63.231', master_user='slave_user', master_password='slave_password';
 show slave status\G;
-mysql -u root -p < sharit.sql
+mysql -u root -p sharit < sharit.sql // remember to drop if it already exists
 show slave status\G;
 ```
 

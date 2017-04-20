@@ -11,7 +11,7 @@ router.get('/NYU/:subdomain_name', function(req, res) { // get all new fresh thr
 
 	if (req.session.data == null) {
 		request.get({
-	    	url: 'http://localhost:3000/NYU/' + req.params.subdomain_name,
+	    	url: api + '/NYU/' + req.params.subdomain_name,
 	    	json: true
 		}, function(error, response, body) {
 			res.render('view_subdomain', {
@@ -27,7 +27,7 @@ router.get('/NYU/:subdomain_name', function(req, res) { // get all new fresh thr
 
 	else if (req.session.data != null) {
 		request.post({
-	    	url: 'http://localhost:3000/NYU/' + req.params.subdomain_name,
+	    	url: api + '/NYU/' + req.params.subdomain_name,
 	    	json: true,
 	    	form: {username: req.session.data.username}
 		}, function(error, response, body) {
@@ -61,7 +61,7 @@ router.get('/create_subdomain/NYU', function(req, res) { // returns subdomain_na
 router.post('/create_subdomain/NYU', function(req, res) { // does not require req.params. addition; variable directly from forms
 	if (req.session.data != null) {
 	    request.post({
-	        url: 'http://localhost:3000/create_subdomain/NYU',
+	        url: api + '/create_subdomain/NYU',
 	        json: true,
 	        form: {
 	        	username: req.session.data.username,
@@ -84,7 +84,7 @@ router.get('/join_subdomain/NYU/:subdomain_name', function(req, res) { // NYU/jo
 
 	if (req.session.data != null) {
 	    request.post({
-	        url: 'http://localhost:3000/join_subdomain/NYU',
+	        url: api + '/join_subdomain/NYU',
 	        json: true,
 	        form: {
 	        	username: req.session.data.username,

@@ -13,7 +13,7 @@ router.get('/vote_thread/NYU/:thread_id/:rating', function(req, res) {
 
 	else if (req.session.data != null) {
 		request.post({ // because fkn hui made a native XMLHttpRequest in GET
-            url: 'http://localhost:3000/vote_thread/NYU',
+            url: api + '/vote_thread/NYU',
             json: true,
             form: {
             	username: req.session.data.username,
@@ -38,7 +38,7 @@ router.get('/vote_comment/NYU/:comment_id/:rating', function(req, res) {
 
 	else if (req.session.data != null) {
 		request.post({ // because fkn hui made a native XMLHttpRequest in GET
-            url: 'http://localhost:3000/vote_comment/NYU',
+            url: api + '/vote_comment/NYU',
             json: true,
             form: {
             	username: req.session.data.username,

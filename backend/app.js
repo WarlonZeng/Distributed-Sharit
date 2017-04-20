@@ -14,6 +14,7 @@ var index = require('./routes/index');
 var subDom = require('./routes/subdomain');
 var thread = require('./routes/thread');
 var comment = require('./routes/comment');
+var rating = require('./routes/rating');
 
 var app = express();
 
@@ -48,6 +49,7 @@ app.use('/', index);
 app.use('/', subDom);
 app.use('/', thread);
 app.use('/', comment);
+app.use('/', rating);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

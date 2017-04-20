@@ -4,6 +4,8 @@ var router = express.Router();
 
 var bcrypt = require('bcryptjs');
 
+var api = 'http://api.distributed-sharit.warloncs.net';
+
 var defaultSub = {
 	All: 0,
 	Bio: 1,
@@ -18,7 +20,7 @@ router.get('/register', function(req, res) {
 
 router.post('/register', function(req, res) {
     request.post({
-        url: 'http://localhost:3000/register',
+        url: api + '/register',
         json: true,
         form: {
             username: req.body.username,
@@ -29,7 +31,7 @@ router.post('/register', function(req, res) {
         // res.redirect("/login");
         if (response.body == "OK") {
             request.post({
-                url: 'http://localhost:3000/login',
+                url: api + '/login',
                 json: true,
                 form: {
                     username: req.body.username,
@@ -53,7 +55,7 @@ router.get('/login', function(req, res){
 
 router.post('/login', function(req, res) {
 	request.post({
-    	url: 'http://localhost:3000/login',
+    	url: api + '/login',
     	json: true,
     	form: {
     		username: req.body.username, 

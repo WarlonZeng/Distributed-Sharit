@@ -2,6 +2,8 @@ var request = require('request');
 var express = require('express');
 var router = express.Router();
 
+var api = 'http://api.distributed-sharit.warloncs.net';
+
 // REQUIRES:
 // username
 // subdomain_name
@@ -14,7 +16,7 @@ router.post('/create_comment/NYU/:subdomain_name/:thread_id', function(req, res)
 
 	else if (req.session.data != null) {
         request.post({
-            url: 'http://localhost:3000/create_comment/NYU',
+            url: api + '/create_comment/NYU',
             json: true,
             form: {
             	username: req.session.data.username,

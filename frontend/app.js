@@ -14,6 +14,7 @@ var index = require('./routes/index');
 var subdomain = require('./routes/subdomain');
 var thread = require('./routes/thread');
 var comment = require('./routes/comment');
+var rating = require('./routes/rating');
 
 var app = express();
 
@@ -38,7 +39,7 @@ var sessionOptions = {
 		expires: false,
 		secure: false
 	},
-	store: new redisStore({ host: 'localhost', port: 6379, client: redisClient}),
+	store: new redisStore({ host: '172.31.7.113', port: 6379, client: redisClient}),
 }
 
 app.use(session(sessionOptions));
@@ -48,6 +49,7 @@ app.use('/', index);
 app.use('/', subdomain);
 app.use('/', thread);
 app.use('/', comment);
+app.use('/', rating);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

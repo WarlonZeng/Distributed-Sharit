@@ -8,9 +8,10 @@ var upload = multer({storage: storage});
 var request = require('request');
 var express = require('express');
 var router = express.Router();
+var cassandra_config = require('../config/cassandra/cassandra_config.js');
 
 var cassandra = require('cassandra-driver');
-var client = new cassandra.Client({ contactPoints: ['172.31.54.227', '172.31.49.209', '172.31.60.212'], keyspace: 'sharit' });
+var client = new cassandra.Client(cassandra_config);
 
 // REQUIRES:
 // subdomain_name
@@ -19,7 +20,7 @@ var client = new cassandra.Client({ contactPoints: ['172.31.54.227', '172.31.49.
 router.get('/NYU/:subdomain_name/:thread_id', function(req, res) {
     if (req.session.data == null) {
         request.get({
-            url: 'http://localhost:3000/NYU/' + req.params.subdomain_name + '/' + req.params.thread_id,
+            url: api + '/NYU/' + req.params.subdomain_name + '/' + req.params.thread_id,
             json: true
         }, function(error, response, body) {
             res.render('view_thread', {
@@ -36,7 +37,7 @@ router.get('/NYU/:subdomain_name/:thread_id', function(req, res) {
     } 
     else if (req.session.data != null) {
         request.post({
-            url: 'http://localhost:3000/NYU/' + req.params.subdomain_name + '/' + req.params.thread_id,
+            url: api + '/NYU/' + req.params.subdomain_name + '/' + req.params.thread_id,
             json: true,
             form: {username: req.session.data.username}
         }, function(error, response, body) {
@@ -83,7 +84,7 @@ router.post('/create_thread/NYU/:subdomain_name', upload.single('file'), functio
             client.execute(insert_file_into_database, [req.file.originalname, timestamp, req.file.buffer], function(err, result) {
                 if (err) console.log(err);
                 request.post({
-                    url: 'http://localhost:3000/create_thread/NYU',
+                    url: api + '/create_thread/NYU',
                     json: true,
                     form: {
                         username: req.session.data.username,
@@ -99,7 +100,7 @@ router.post('/create_thread/NYU/:subdomain_name', upload.single('file'), functio
             });
         } else {
             request.post({
-                url: 'http://localhost:3000/create_thread/NYU',
+                url: api + '/create_thread/NYU',
                 json: true,
                 form: {
                     username: req.session.data.username,
