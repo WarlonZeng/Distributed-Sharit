@@ -2,6 +2,8 @@ var request = require('request');
 var express = require('express');
 var router = express.Router();
 
+var api = 'http://api.distributed-sharit.warloncs.net';
+
 // currently fixed for NYU.. support for more domains can be considered via /d/
 
 // REQUIRES:

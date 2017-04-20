@@ -13,6 +13,8 @@ var cassandra_config = require('../config/cassandra/cassandra_config.js');
 var cassandra = require('cassandra-driver');
 var client = new cassandra.Client(cassandra_config);
 
+var api = 'http://api.distributed-sharit.warloncs.net';
+
 // REQUIRES:
 // subdomain_name
 // thread_id
