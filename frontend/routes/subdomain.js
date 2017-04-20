@@ -52,8 +52,8 @@ router.post('/create_subdomain/NYU', function(req, res) { // does not require re
 	        url: 'http://localhost:3000/create_subdomain/NYU',
 	        json: true,
 	        form: {
-	        	subdomain_name: req.body.subdomain_name,
-	        	username: req.session.data.username
+	        	username: req.session.data.username,
+	        	subdomain_name: req.body.subdomain_name
 	        }
 	    }, function(error, response, body) {
 	    	req.session.data.user_subdomains_in = response.body.user_subdomains_in;
@@ -75,8 +75,8 @@ router.get('/join_subdomain/NYU/:subdomain_name', function(req, res) { // NYU/jo
 	        url: 'http://localhost:3000/join_subdomain/NYU',
 	        json: true,
 	        form: {
-	        	subdomain_name: req.params.subdomain_name,
-	        	username: req.session.data.username
+	        	username: req.session.data.username,
+	        	subdomain_name: req.params.subdomain_name
 	        }
 	    }, function(error, response, body) {
 	    	req.session.data.user_subdomains_in = response.body.user_subdomains_in;

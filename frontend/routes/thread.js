@@ -31,8 +31,8 @@ router.get('/NYU/:subdomain_name/:thread_id', function(req, res) {
 
 	    else if (req.session.data != null) {
 			res.render('view_thread', {
-				nav: req.session.data.ALL_DOMAINS
-				subnav: req.session.data.ALL_SUBDOMAINS,
+				nav: req.session.data.user_domains_in,
+				subnav: req.session.data.user_subdomains_in,
 	    		thread: response.body.thread[0],
 	    		comments: response.body.comments,
 	    		filename: response.body.filename[0],
@@ -71,8 +71,8 @@ router.post('/create_thread/NYU/:subdomain_name', function(req, res) { // get ba
             url: 'http://localhost:3000/create_thread/NYU',
             json: true,
             form: {
-            	subdomain_name: req.params.subdomain_name,
             	username: req.session.data.username,
+            	subdomain_name: req.params.subdomain_name,
                 title: req.body.title,
                 context: req.body.context,
                 file: req.file
