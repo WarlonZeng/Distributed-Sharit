@@ -1,79 +1,45 @@
 var express = require('express');
-
 var router = express.Router();
+
 var mysql = require('mysql');
 var configDB = require('../config/dbconfig.js');
 var pool = new mysql.createPool(configDB);
 
-function getPoints(client, id, res, done, query) {
-	client.query(query, [id], function(err, result) {
-		res.json(result[0]);
-	})
-}
-
-router.get('/voteThread/:user/:thread_id/:rating', function(req, res){
-	if(! req.session.hasOwnProperty(req.params.user)){
-		res.redirect('/');
-	}
-	var queryFind = 'SELECT username FROM thread_ratings WHERE thread_id = ? and username = ?';
-	var voteThread = 'INSERT INTO thread_ratings (thread_id, username, rating) VALUES(?, ?, ?)';
-	var updateVote = 'UPDATE thread_ratings SET rating = ? WHERE thread_id = ? and username = ?';
-	var updateThreadPoints = 'UPDATE thread SET points = points + ? WHERE thread_id = ? and username = ?'
-	var findPoints = 'SELECT points FROM thread WHERE id = ?';
-
-	console.log('hi');
+// REQUIRES: 
+// username
+// thread_id
+// rating
+router.post('/vote_thread/NYU', function(req, res) {
+	var update_thread_points = 'INSERT INTO thread_rating (thread_id, username, rating) VALUES (?, ?, ?); ' + 
+	'UPDATE thread SET thread_points = thread_points + ? WHERE thread_id = ?;'
+	var find_thread_points = 'SELECT thread_points FROM thread WHERE thread_id = ?';
 
 	pool.getConnection(function(err, client, done) {
-		client.query(queryFind, [req.params.thread_id, req.params.user], function(err, result) { // if did not vote
-			if (result.length === 0) {
-				client.query(voteThread, [req.params.thread_id, req.params.user, req.params.rating], function(err, result) { // vote
- 					getPoints(client, req.params.thread_id, res, done, findPoints);
- 					client.release();
-				});
-			}
-			else if (result[0].rating != req.params.rating) { // make sure we only update the opposite 
-				client.query(updateVote, [req.params.rating, req.params.thread_id, req.params.user], function(err, result) {
-					client.query(updateThreadPoints, [req.params.rating, req.params.thread_id, req.params.user], function(err, result) {
-						getPoints(client, req.params.thread_id, res, done, findPoints);
-						client.release();
-					});
-				});
-			}
+		client.query(update_thread_points, [req.body.thread_id, req.body.username, req.body.rating, req.body.rating, req.body.thread_id], function(err, result) {
+			client.query(find_thread_points, [req.body.thread_id], function(err, result) {
+				res.json(points: result[0]);	
+			});
 		});
 	});
 });
 
-router.get('/voteComment/:user/:comment_id/:rating', function(req, res) {
-	if(!req.session.hasOwnProperty(req.params.user)) {
-		res.redirect('/');
-	}
-
-	var voteComment = 'INSERT INTO comment_rating (comment_id, username, rating) VALUES(?, ?, ?)';
-	var queryFind = 'SELECT username FROM comment_rating WHERE comment_id = ? and username = ?';
-	var updateVote = 'UPDATE comment_rating SET rating = ? WHERE comment_id = ? and username = ?';
-	var updateThreadPoints = 'UPDATE thread SET points = points + ? WHERE thread_id = ? and username = ?'
-	var findPoints = 'SELECT points FROM comment WHERE id = ?';
+// REQUIRES: 
+// username
+// comment_id
+// rating
+router.post('/vote_comment/NYU', function(req, res) {
+	var update_comment_pointss = 'INSERT INTO comment_rating (comment_id, username, rating) VALUES (?, ?, ?); ' + 
+	'UPDATE comment SET comment_points = comment_points + ? WHERE comment_id = ?;'
+	var find_comment_points = 'SELECT comment_points FROM comments WHERE comment_id = ?';
 
 	pool.getConnection(function(err, client, done) {
-		client.query(queryFind, [req.params.comment_id, req.params.user], function(err, result) {
-			if (result.length === 0) {
-				client.query(voteComment, [req.params.comment_id, req.params.user, req.params.rating], function(err, result) {
-					getPoints(client, req.params.comment_id, res, done, findPoints);
-					client.release();
-				});
-			}
-			else if (result[0].rating != req.parms.rating) {
-				client.query(updateVote, [req.params.rating, req.params.comment_id, req.params.user], function(err, result) {
-					client.query(updateThreadPoints, [req.params.rating, req.params.thread_id, req.params.user], function(err, result) {
-						getPoints(client, req.params.thread_id, res, done, findPoints);
-						client.release();
-					});
-				});
-			}
+		client.query(update_comment_points, [req.body.comment_id, req.body.username, req.body.rating, req.body.rating, req.body.comment_id], function(err, result) {
+			client.query(find_comment_points, [req.body.comment_id], function(err, result) {
+				res.json(points: result[0]);		
+			});
 		});
 	});
 });
-
 
 
 module.exports = router;

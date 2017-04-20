@@ -7,23 +7,44 @@ var request = require('request');
 var express = require('express');
 var router = express.Router();
 
+// REQUIRES:
+// subdomain_name
+// thread_id
+// username
 router.get('/NYU/:subdomain_name/:thread_id', function(req, res) {
 	request.get({
 	    url: 'http://localhost:3000/NYU/' + req.params.subdomain_name + '/' + req.params.thread_id,
 	    json: true
 	}, function(error, response, body) {
-		res.render('view_thread', {
-			nav: response.body.ALL_DOMAINS, 
-			subnav: response.body.ALL_SUBDOMAINS,
-	    	thread: response.body.thread[0],
-	    	comments: response.body.comments,
-	    	filename: response.body.filename[0],
-	    	subdomain_name: req.params.subdomain_name,
-	    	logged: false
-	    });
+		if (req.session.data == null) {
+
+			res.render('view_thread', {
+				nav: response.body.ALL_DOMAINS, 
+				subnav: response.body.ALL_SUBDOMAINS,
+	    		thread: response.body.thread[0],
+	    		comments: response.body.comments,
+	    		filename: response.body.filename[0],
+	    		subdomain_name: req.params.subdomain_name,
+	    		logged: false
+	    	});
+		}
+
+	    else if (req.session.data != null) {
+			res.render('view_thread', {
+				nav: req.session.data.ALL_DOMAINS
+				subnav: req.session.data.ALL_SUBDOMAINS,
+	    		thread: response.body.thread[0],
+	    		comments: response.body.comments,
+	    		filename: response.body.filename[0],
+	    		subdomain_name: req.params.subdomain_name,
+	    		logged: true
+	    	});
+	    }
 	});
 });
 
+// REQUIRES:
+// subdomain_name
 router.get('/create_thread/NYU/:subdomain_name', function(req, res) {
 	if (req.session.data == null) {
 		return res.redirect('/login');
@@ -32,6 +53,12 @@ router.get('/create_thread/NYU/:subdomain_name', function(req, res) {
 });
 
 // router.post('/create_thread/NYU/:subdomain_name', upload.single('file'), function(req, res) {
+// REQUIRES:
+// subdomain_name
+// username
+// title
+// context
+// file
 router.post('/create_thread/NYU/:subdomain_name', function(req, res) { // get back to this for file
 
 	console.log("req.body: ", req.body);
@@ -41,13 +68,13 @@ router.post('/create_thread/NYU/:subdomain_name', function(req, res) { // get ba
     if (req.session.data != null) {
 
         request.post({
-            url: 'http://localhost:3000/create_thread/NYU/' + req.params.subdomain_name,
+            url: 'http://localhost:3000/create_thread/NYU',
             json: true,
             form: {
+            	subdomain_name: req.params.subdomain_name,
+            	username: req.session.data.username,
                 title: req.body.title,
                 context: req.body.context,
-                subdomain_name: req.params.subdomain_name,
-                username: req.session.data.username,
                 file: req.file
             }
         }, function(error, response, body) {

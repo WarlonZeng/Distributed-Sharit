@@ -4,6 +4,9 @@ var router = express.Router();
 
 // currently fixed for NYU.. support for more domains can be considered via /d/
 
+// REQUIRES:
+// subdomain_name
+// username
 router.get('/NYU/:subdomain_name', function(req, res) { // get all new fresh threads
 	request.get({
 	    url: 'http://localhost:3000/NYU/' + req.params.subdomain_name,
@@ -31,6 +34,8 @@ router.get('/NYU/:subdomain_name', function(req, res) { // get all new fresh thr
 	});
 });
 
+// REQUIRES:
+// username
 router.get('/create_subdomain/NYU', function(req, res) { // returns subdomain_name
 	if (req.session.data == null) {
 		return res.redirect('/login');
@@ -38,6 +43,9 @@ router.get('/create_subdomain/NYU', function(req, res) { // returns subdomain_na
 	res.render('create_subdomain');
 });
 
+// REQUIRES:
+// subdomain_name
+// username
 router.post('/create_subdomain/NYU', function(req, res) { // does not require req.params. addition; variable directly from forms
 	if (req.session.data != null) {
 	    request.post({
@@ -54,6 +62,9 @@ router.post('/create_subdomain/NYU', function(req, res) { // does not require re
 	}
 });
 
+// REQUIRES:
+// subdomain_name
+// username
 router.get('/join_subdomain/NYU/:subdomain_name', function(req, res) { // NYU/join_subdomain/cooking
 	if (req.session.data == null) {
 		return res.redirect('/login');

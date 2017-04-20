@@ -4,6 +4,8 @@ var mysql = require('mysql');
 var configDB = require('../config/dbconfig.js');
 var pool = new mysql.createPool(configDB);
 
+// REQUIRES:
+// subdomain_name
 router.get('/NYU/:subdomain_name', function(req, res) { // get all new fresh threads
 	var FIND_ALL_DOMAINS = 'SELECT domain_name, domain_id FROM domain';
     var FIND_ALL_SUBDOMAINS = 'SELECT domain_name, subdomain_name, subdomain_id FROM subdomain NATURAL JOIN domain';
@@ -25,6 +27,9 @@ router.get('/NYU/:subdomain_name', function(req, res) { // get all new fresh thr
 	});
 });
 
+// REQUIRES:
+// subdomain_name
+// username
 router.post('/create_subdomain/NYU', function(req, res) {
 	//The LAST_INSERT_ID() function only returns the most recent autoincremented id value for the most recent INSERT operation, to any table, on your MySQL connection.
 	
@@ -49,6 +54,9 @@ router.post('/create_subdomain/NYU', function(req, res) {
 	});
 });
 
+// REQUIRES:
+// subdomain_name
+// username
 router.post('/join_subdomain/NYU', function(req, res) {
 	var insert_user_into_subdomain = 'INSERT INTO subdomain_user (subdomain_id, username, subdomain_moderator) SELECT subdomain_id, ?, true FROM subdomain WHERE subdomain_name = ?'
 	var find_user_subdomains_in = 'SELECT * FROM subdomain_user NATURAL JOIN subdomain NATURAL JOIN domain_user NATURAL JOIN domain WHERE username = ?';
