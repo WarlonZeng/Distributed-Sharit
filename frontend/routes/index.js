@@ -13,7 +13,7 @@ var defaultSub = {
 }
 
 router.get('/', function(req, res) { // session: get user_domains, user_subdomains, index: user_subdomains_not_in, user_threads
-	console.log("req.session.data:", req.session.data);
+	// console.log("req.session.data:", req.session.data);
 
 	if (req.session.data == null) {
 		request.get({
@@ -48,7 +48,7 @@ router.get('/', function(req, res) { // session: get user_domains, user_subdomai
 });
 
 router.get('/NYU', function(req, res) { // session: get user_domains, user_subdomains, index: user_subdomains_not_in, user_threads
-	console.log("req.session.data:", req.session.data);
+	// console.log("req.session.data:", req.session.data);
 
 	if (req.session.data == null) {
 		request.get({
