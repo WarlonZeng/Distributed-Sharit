@@ -8,9 +8,8 @@ var slave1_config = require('../config/mysql/slave1_config.js');
 var slave2_config = require('../config/mysql/slave2_config.js');
 poolCluster.add('MASTER', master_config);
 poolCluster.add('SLAVE1', slave1_config);
-poolCluster.add('SLAVE2', slave2_config);
+poolCluster.add('SLAVE2', slave2_config);;
 
-import parallel from 'async/parallel';
 
 // subdomain_name
 router.get('/NYU/:subdomain_name', function(req, res) { // get all new fresh threads
@@ -19,28 +18,16 @@ router.get('/NYU/:subdomain_name', function(req, res) { // get all new fresh thr
 	var FIND_SUBDOMAIN_THREADS = 'SELECT * FROM domain NATURAL JOIN subdomain NATURAL JOIN thread NATURAL JOIN file WHERE subdomain_name = ? ORDER BY thread_points DESC';
 	
 	poolCluster.getConnection('SLAVE*', function(err, client) {
-		// client.query(FIND_ALL_DOMAINS, [], function(err, ALL_DOMAINS) {
-		// 	client.query(FIND_ALL_SUBDOMAINS, [], function(err, ALL_SUBDOMAINS) {
-		// 		client.query(FIND_SUBDOMAIN_THREADS, [req.params.subdomain_name], function(err, subdomain_threads) {
-		// 			client.release();
-		// 			res.json({
-		// 				ALL_DOMAINS, 
-		// 				ALL_SUBDOMAINS, 
-		// 				subdomain_threads
-		// 			});
-		// 		});
-		// 	});
-		// });
-		async.parallel([
-			client.query(FIND_ALL_DOMAINS, [], function(err, ALL_DOMAINS) {if (err) console.log(err)}),
-			client.query(FIND_ALL_SUBDOMAINS, [], function(err, ALL_SUBDOMAINS) {if (err) console.log(err)}),
-			client.query(FIND_SUBDOMAIN_THREADS, [req.params.subdomain_name], function(err, subdomain_threads) {if (err) console.log(err)})
-		], function(err, results) {
-			client.release();
-			res.json({
-				ALL_DOMAINS, 
-				ALL_SUBDOMAINS, 
-				subdomain_threads
+		client.query(FIND_ALL_DOMAINS, [], function(err, ALL_DOMAINS) {
+			client.query(FIND_ALL_SUBDOMAINS, [], function(err, ALL_SUBDOMAINS) {
+				client.query(FIND_SUBDOMAIN_THREADS, [req.params.subdomain_name], function(err, subdomain_threads) {
+					client.release();
+					res.json({
+						ALL_DOMAINS, 
+						ALL_SUBDOMAINS, 
+						subdomain_threads
+					});
+				});
 			});
 		});
 	});
@@ -53,44 +40,24 @@ router.post('/NYU/:subdomain_name', function(req, res) { // get all new fresh th
     var find_user_joined_subdomain = 'SELECT * FROM subdomain_user NATURAL JOIN subdomain WHERE username = ? AND subdomain_name = ?';
 
     poolCluster.getConnection('SLAVE*', function(err, client) {
-        // client.query(FIND_SUBDOMAIN_THREADS, [req.params.subdomain_name], function(err, subdomain_threads) {
-        //     client.query(find_user_joined_subdomain, [req.body.username, req.params.subdomain_name], function(err, joined) {
-        //         if (joined.length != 0) {
-        //             client.release();
-        //             res.json({
-        //                 subdomain_threads,
-        //                 joined: true
-        //             });
-        //         } 
-        //         else {
-        //             client.release();
-        //             res.json({
-        //                 subdomain_threads,
-        //                 joined: false
-        //             });
-        //         }
-        //     });
-        // });
-		async.parallel([
-			client.query(FIND_SUBDOMAIN_THREADS, [req.params.subdomain_name], function(err, subdomain_threads) {if (err) console.log(err)}),
-			client.query(find_user_joined_subdomain, [req.body.username, req.params.subdomain_name], function(err, joined) {if (err) console.log(err)})
-		], function(err, results) {
-			client.release();
-			if (joined.length != 0) {
-				client.release();
-				res.json({
-					subdomain_threads,
-					joined: true
-				});
-			} 
-			else {
-				client.release();
-				res.json({
-					subdomain_threads,
-					joined: false
-				});
-			}
-		});
+        client.query(FIND_SUBDOMAIN_THREADS, [req.params.subdomain_name], function(err, subdomain_threads) {
+            client.query(find_user_joined_subdomain, [req.body.username, req.params.subdomain_name], function(err, joined) {
+                if (joined.length != 0) {
+                    client.release();
+                    res.json({
+                        subdomain_threads,
+                        joined: true
+                    });
+                } 
+                else {
+                    client.release();
+                    res.json({
+                        subdomain_threads,
+                        joined: false
+                    });
+                }
+            });
+        });
     });
 });
 
@@ -120,6 +87,7 @@ router.post('/create_subdomain/NYU', function(req, res) {
 		});
 	});
 });
+
 
 // subdomain_name
 // username
