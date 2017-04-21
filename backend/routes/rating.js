@@ -55,40 +55,48 @@ router.post('/vote_thread/NYU', function(req, res) {
 // comment_id
 // rating
 router.post('/vote_comment/NYU', function(req, res) {
-	var find_if_voted = 'SELECT rating FROM comment_rating WHERE username = ? AND comment_id = ?';
-	var update_user_rating_and_comment_points = 'UPDATE comment_rating SET rating = rating + ? WHERE username = ?;' + 
-	'UPDATE comment SET comment_points = comment_points + ? WHERE comment_id = ?';
-	var insert_user_rating_and_comment_points = 'INSERT INTO comment_rating (comment_id, username, rating) VALUES (?, ?, ?);' + 
-	'UPDATE comment SET comment_points = comment_points + ? WHERE comment_id = ?;'
-	var find_comment_points = 'SELECT comment_points FROM comment WHERE comment_id = ?';
+    var find_if_voted = 'SELECT rating FROM comment_rating WHERE username = ? AND comment_id = ?';
+    var update_user_rating_and_comment_points = 'UPDATE comment_rating SET rating = rating + ? WHERE username = ?;' +
+        'UPDATE comment SET comment_points = comment_points + ? WHERE comment_id = ?';
+    var insert_user_rating_and_comment_points = 'INSERT INTO comment_rating (comment_id, username, rating) VALUES (?, ?, ?);' +
+        'UPDATE comment SET comment_points = comment_points + ? WHERE comment_id = ?;'
+    var find_comment_points = 'SELECT comment_points FROM comment WHERE comment_id = ?';
 
-	poolCluster.getConnection('MASTER', function(err, client) {
-		client.query(find_if_voted, [req.body.username, req.body.comment_id], function(err, result) {
-			console.log(result);
-			if (result.length != 0) {
-				if (result[0].rating == req.body.rating) { // person voted the same rating, dismiss
-					client.query(find_comment_points, [req.body.comment_id], function(err, result) {
-						res.json({points: result[0]});
-					});
-				}
-				else if (result[0].rating != req.body.rating) {
-					client.query(update_user_rating_and_comment_points, [req.body.rating, req.body.username, req.body.rating, req.body.comment_id], function(err, result) {
-						client.query(find_comment_points, [req.body.comment_id], function(err, result) {
-							res.json({points: result[0]});
-						});
-					});
-				}
-			}
-			else {
-				client.query(insert_user_rating_and_comment_points, [req.body.comment_id, req.body.username, req.body.rating, req.body.rating, req.body.comment_id], function(err, result) {
-					if (err) console.log(err);
-					client.query(find_comment_points, [req.body.comment_id], function(err, result) {
-						res.json({points: result[0]});
-					});
-				});
-			}
-		});
-	});
+    poolCluster.getConnection('MASTER', function(err, client) {
+        client.query(find_if_voted, [req.body.username, req.body.comment_id], function(err, result) {
+            console.log(result);
+            if (result.length != 0) {
+                if (result[0].rating == req.body.rating) { // person voted the same rating, dismiss
+                    client.query(find_comment_points, [req.body.comment_id], function(err, result) {
+                        res.json({
+                            points: result[0]
+                        });
+                    });
+                } 
+                else if (result[0].rating != req.body.rating) {
+                    client.query(update_user_rating_and_comment_points, [req.body.rating, req.body.username, req.body.rating, req.body.comment_id], function(err, result) {
+                        client.query(find_comment_points, [req.body.comment_id], function(err, result) {
+                            res.json({
+                                points: result[0]
+                            });
+                        });
+                    });
+                }
+            } 
+            else {
+                client.query(insert_user_rating_and_comment_points, [req.body.comment_id, req.body.username, req.body.rating, req.body.rating, req.body.comment_id], function(err, result) {
+                    client.query(insert_user_rating_and_comment_points, [req.body.comment_id, req.body.username, req.body.rating, req.body.rating, req.body.comment_id], function(err, result) {
+                        if (err) console.log(err);
+                        client.query(find_comment_points, [req.body.comment_id], function(err, result) {
+                            res.json({
+                                points: result[0]
+                            });
+                        });
+                    });
+                });
+            };
+        });
+    });
 });
 
 
