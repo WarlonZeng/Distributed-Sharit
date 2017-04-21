@@ -24,7 +24,7 @@ router.get('/vote_thread/NYU/:thread_id/:rating', function(req, res) {
             }
         }, function(error, response, body) {
         	console.log(response.body);
-            res.json({points: response.body});
+            res.json({points: response.body.thread_points});
         });
 	}
 });
@@ -49,7 +49,7 @@ router.get('/vote_comment/NYU/:comment_id/:rating', function(req, res) {
             }
         }, function(error, response, body) {
             console.log(response.body);
-        	res.json({points: response.body});
+        	res.json({points: response.body.comment_points});
         });
 	}
 });
