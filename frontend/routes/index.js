@@ -26,7 +26,8 @@ router.get('/', function(req, res) { // session: get user_domains, user_subdomai
 				subnav: response.body.ALL_SUBDOMAINS, 
 				check_subdomains: response.body.ALL_SUBDOMAINS, 
 				threads: response.body.ALL_THREADS, 
-				logged: false});
+				logged: false
+			});
 		});
 	}
 
@@ -42,7 +43,8 @@ router.get('/', function(req, res) { // session: get user_domains, user_subdomai
 				subnav: req.session.data.user_subdomains_in, 
 				check_subdomains: response.body.user_subdomains_not_in, 
 				threads: response.body.user_threads_in, 
-				logged: true});
+				logged: true
+			});
 		});
 	}
 });
@@ -61,7 +63,8 @@ router.get('/NYU', function(req, res) { // session: get user_domains, user_subdo
 				subnav: response.body.ALL_SUBDOMAINS, 
 				check_subdomains: response.body.ALL_SUBDOMAINS, 
 				threads: response.body.ALL_THREADS, 
-				logged: false});
+				logged: false
+			});
 		});
 	}
 
@@ -77,7 +80,8 @@ router.get('/NYU', function(req, res) { // session: get user_domains, user_subdo
 				subnav: req.session.data.user_subdomains_in, 
 				check_subdomains: response.body.user_subdomains_not_in, 
 				threads: response.body.user_threads_in, 
-				logged: true});
+				logged: true
+			});
 		});
 	}
 });
