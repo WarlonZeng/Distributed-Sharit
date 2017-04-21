@@ -29,7 +29,7 @@ router.post('/vote_thread/NYU', function(req, res) {
 			if (result.length != 0) {
 				if (result[0].rating == req.body.rating) { // person voted the same rating, dismiss
 					client.query(find_thread_points, [req.body.thread_id], function(err, result) {
-						res.json({points: result[0]});
+						res.json(result[0]);
 					});
 				}
 				else if (result[0].rating != req.body.rating) {
@@ -43,7 +43,7 @@ router.post('/vote_thread/NYU', function(req, res) {
 			else {
 				client.query(insert_user_rating_and_thread_points, [req.body.thread_id, req.body.username, req.body.rating, req.body.rating, req.body.thread_id], function(err, result) {
 					client.query(find_thread_points, [req.body.thread_id], function(err, result) {
-						res.json({points: result[0]});
+						res.json(result[0]);
 					});
 				});
 			}
