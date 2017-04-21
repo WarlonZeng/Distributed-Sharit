@@ -109,8 +109,8 @@ router.post('/create_thread/NYU', function(req, res) {
 		else if (req.body.filename) { // there is file
 			console.log('file received');
 			var create_thread = 'INSERT INTO thread (subdomain_id, title, author, context) ' + 
-			'SELECT subdomain_id, ?, ?, ? FROM subdomain WHERE subdomain_name = ?; INSERT INTO file (thread_id, filename, timestamp) VALUES (LAST_INSERT_ID(), ?, ?);'; 
-			client.query(create_thread, [req.body.title, req.body.username, req.body.context, req.body.subdomain_name, req.body.filename, req.body.timestamp], function(err, result) {
+			'SELECT subdomain_id, ?, ?, ? FROM subdomain WHERE subdomain_name = ?; INSERT INTO file (thread_id, filename, hash) VALUES (LAST_INSERT_ID(), ?, ?);'; 
+			client.query(create_thread, [req.body.title, req.body.username, req.body.context, req.body.subdomain_name, req.body.filename, req.body.hash], function(err, result) {
 				if (err) console.log(err);
 				res.json("OK");
 			});

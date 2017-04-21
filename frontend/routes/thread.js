@@ -80,10 +80,9 @@ router.post('/create_thread/NYU/:subdomain_name', upload.single('file'), functio
 
     if (req.session.data != null) {
         if (req.file) {
-            var insert_file_into_database = 'INSERT INTO file (timestamp, filename, file_data) VALUES (?, ?, ?)';
-            var timestamp = new Date().valueOf();
-
-            client.execute(insert_file_into_database, [timestamp, req.file.originalname, req.file.buffer], function(err, result) {
+            var insert_file_into_database = 'INSERT INTO file (hash, filename, file_data) VALUES (?, ?, ?)';
+            var hash = req.params.subdomain_name + '_' + req.session.data.username + '_' + req.file.originalname;
+            client.execute(insert_file_into_database, [hash, req.file.originalname, req.file.buffer], function(err, result) {
                 if (err) console.log(err);
                 request.post({
                     url: api + '/create_thread/NYU',
@@ -94,7 +93,7 @@ router.post('/create_thread/NYU/:subdomain_name', upload.single('file'), functio
                         title: req.body.title,
                         context: req.body.context,
                         filename: req.file.originalname,
-                        timestamp: timestamp
+                        hash: hash
                     }
                 }, function(error, response, body) {
                     res.redirect('/NYU/' + req.params.subdomain_name);
@@ -111,7 +110,7 @@ router.post('/create_thread/NYU/:subdomain_name', upload.single('file'), functio
                     title: req.body.title,
                     context: req.body.context,
                     filename: null,
-                    timestamp: null
+                    hash: null
                 }
             }, function(error, response, body) {
                 res.redirect('/NYU/' + req.params.subdomain_name);
