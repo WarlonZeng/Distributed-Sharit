@@ -2,8 +2,13 @@ var express = require('express');
 var router = express.Router();
 
 var mysql = require('mysql');
-var configDB = require('../config/dbconfig.js');
-var pool = new mysql.createPool(configDB);
+var poolCluster = mysql.createPoolCluster();
+var master_config = require('../config/mysql/master_config.js');
+var slave1_config = require('../config/mysql/slave1_config.js');
+var slave2_config = require('../config/mysql/slave2_config.js');
+poolCluster.add('MASTER', master_config);
+poolCluster.add('SLAVE1', slave1_config);
+poolCluster.add('SLAVE2', slave2_config);
 
 var bcrypt = require('bcryptjs');
 
@@ -26,7 +31,7 @@ router.post('/register', function(req, res) {
 	var salt =  bcrypt.genSaltSync(10);
 	var hash = bcrypt.hashSync(req.body.password, salt);
 
-	pool.getConnection(function(err, client, done) {  // working
+	poolCluster.getConnection('MASTER', function(err, client) {
 
 		client.query(find_user, [req.body.username], function(err, result) {
 			if (err) res.json(err);
@@ -51,10 +56,6 @@ router.post('/register', function(req, res) {
 	});
 });
 
-router.get('/login', function(req, res){
-	res.render('login');
-});
-
 router.post('/login', function(req, res) { // get all domains and subdomains this user is in
 	var findSalt = 'SELECT salt FROM user WHERE username = ?';
 	var validLogin = 'SELECT * FROM user WHERE username = ? and hash = ?';
@@ -62,7 +63,7 @@ router.post('/login', function(req, res) { // get all domains and subdomains thi
 	// var find_subdomains_user_in = 'SELECT * from subdomain_user as perm JOIN subdomain as dom ON (perm.subdomain_id = dom.id) WHERE username = ?';
 	var find_user_subdomains_in = 'SELECT * FROM subdomain_user NATURAL JOIN subdomain NATURAL JOIN domain_user NATURAL JOIN domain WHERE username = ?'
 
-	pool.getConnection(function(err, client, done) {
+	poolCluster.getConnection('SLAVE*', function(err, client) {
 		client.query(findSalt, [req.body.username], function(err, result) {
 			if (err) {
 				console.log('Error running query', err);

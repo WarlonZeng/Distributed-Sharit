@@ -1,14 +1,14 @@
-// var fs = require('fs');
-// var multer = require('multer');
-// var upload = multer({ dest: destStr })
-// var destStr = 'uploads/';
-
 var express = require('express');
 var router = express.Router();
 
 var mysql = require('mysql');
-var configDB = require('../config/dbconfig.js');
-var pool = new mysql.createPool(configDB);
+var poolCluster = mysql.createPoolCluster();
+var master_config = require('../config/mysql/master_config.js');
+var slave1_config = require('../config/mysql/slave1_config.js');
+var slave2_config = require('../config/mysql/slave2_config.js');
+poolCluster.add('MASTER', master_config);
+poolCluster.add('SLAVE1', slave1_config);
+poolCluster.add('SLAVE2', slave2_config);
 
 // REQUIRES:
 // subdomain_name
@@ -21,7 +21,7 @@ router.get('/NYU/:subdomain_name/:thread_id', function(req, res) {
 	var thread_comments = 'SELECT * FROM comment WHERE thread_id = ? ORDER BY comment_points DESC, date_posted DESC';
 	var thread_file = 'SELECT filename FROM thread NATURAL JOIN file WHERE thread_id = ?';
 
-	pool.getConnection(function(err, client, done) {
+	poolCluster.getConnection('SLAVE*', function(err, client) {
 	    client.query(FIND_ALL_DOMAINS, [], function(err, ALL_DOMAINS) {
 	        client.query(FIND_ALL_SUBDOMAINS, [], function(err, ALL_SUBDOMAINS) {
 	            client.query(threads_info, [req.params.thread_id], function(err, thread) {
@@ -52,7 +52,7 @@ router.post('/NYU/:subdomain_name/:thread_id', function(req, res) {
     var thread_file = 'SELECT filename FROM thread NATURAL JOIN file WHERE thread_id = ?';
     var find_user_joined_subdomain = 'SELECT * FROM subdomain_user NATURAL JOIN subdomain WHERE username = ? AND subdomain_name = ?';
 
-    pool.getConnection(function(err, client, done) {
+    poolCluster.getConnection('SLAVE*', function(err, client) {
         client.query(threads_info, [req.params.thread_id], function(err, thread) {
             client.query(thread_comments, [req.params.thread_id], function(err, comments) {
                 client.query(thread_file, [req.params.thread_id], function(err, filename) {
@@ -92,7 +92,7 @@ router.post('/NYU/:subdomain_name/:thread_id', function(req, res) {
 // context
 // file
 router.post('/create_thread/NYU', function(req, res) {
-	pool.getConnection(function(err, client, done) {
+	poolCluster.getConnection('MASTER', function(err, client) {
 
 		console.log(req.body);
 		console.log(req.file);
