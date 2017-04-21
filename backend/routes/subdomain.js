@@ -11,6 +11,7 @@ poolCluster.add('SLAVE1', slave1_config);
 poolCluster.add('SLAVE2', slave2_config);
 
 var async = require('async');
+import parallel from 'async/parallel';
 
 // subdomain_name
 router.get('/NYU/:subdomain_name', function(req, res) { // get all new fresh threads
