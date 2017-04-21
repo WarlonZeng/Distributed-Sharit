@@ -10,7 +10,6 @@ poolCluster.add('MASTER', master_config);
 poolCluster.add('SLAVE1', slave1_config);
 poolCluster.add('SLAVE2', slave2_config);
 
-var async = require('async');
 import parallel from 'async/parallel';
 
 // var configDB = require('../config/dbconfig.js');
