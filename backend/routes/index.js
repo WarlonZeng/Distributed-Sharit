@@ -10,6 +10,8 @@ poolCluster.add('MASTER', master_config);
 poolCluster.add('SLAVE1', slave1_config);
 poolCluster.add('SLAVE2', slave2_config);
 
+var async = require('async');
+
 // var configDB = require('../config/dbconfig.js');
 // var pool = new mysql.createPool(configDB);
 
@@ -27,13 +29,21 @@ router.get('/', function(req, res) { // General domains and subdomains
 	var FIND_ALL_THREADS = 'SELECT * FROM domain NATURAL JOIN subdomain NATURAL JOIN thread NATURAL JOIN file';
 
 	poolCluster.getConnection('SLAVE*', function(err, client) {
-		client.query(FIND_ALL_DOMAINS, [], function(err, ALL_DOMAINS) {
-			client.query(FIND_ALL_SUBDOMAINS, [], function(err, ALL_SUBDOMAINS) {
-				client.query(FIND_ALL_THREADS, [], function(err, ALL_THREADS) {
-					client.release();
-					res.json({ALL_DOMAINS, ALL_SUBDOMAINS, ALL_THREADS});
-				});
-			});
+		// client.query(FIND_ALL_DOMAINS, [], function(err, ALL_DOMAINS) {
+		// 	client.query(FIND_ALL_SUBDOMAINS, [], function(err, ALL_SUBDOMAINS) {
+		// 		client.query(FIND_ALL_THREADS, [], function(err, ALL_THREADS) {
+		// 			client.release();
+		// 			res.json({ALL_DOMAINS, ALL_SUBDOMAINS, ALL_THREADS});
+		// 		});
+		// 	});
+		// });
+		async.parallel([
+			client.query(FIND_ALL_DOMAINS, [], function(err, ALL_DOMAINS) {if (err) console.log(err)}),
+			client.query(FIND_ALL_SUBDOMAINS, [], function(err, ALL_SUBDOMAINS) {if (err) console.log(err)}),
+			client.query(FIND_ALL_THREADS, [], function(err, ALL_THREADS) {if (err) console.log(err)})
+		], function(err, results) {
+			client.release();
+			res.json({ALL_DOMAINS, ALL_SUBDOMAINS, ALL_THREADS});
 		});
 	});
 });
