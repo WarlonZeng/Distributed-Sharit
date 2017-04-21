@@ -118,18 +118,15 @@ router.post('/create_thread/NYU', function(req, res) {
 	});
 });
 
-// router.get('/downloadFile/:thread_id', function(req, res){
-// 	var downloadFile = 'SELECT filename, data FROM file WHERE thread_id = ?';
+router.post('/download_file/NYU', function(req, res) {
+	var get_file_hash = 'SELECT hash FROM file WHERE thread_id = ?';
 
-// 	pool.getConnection(function(err, client, done){
-// 		client.query(downloadFile, [req.params.thread_id], function(err, result){
-// 			client.release();
-// 			var filename = result[0].filename;
-//     		var data = result[0].data;
-//     		res.set('Content-disposition', 'attachment;filename=' + filename);
-//     		res.send(new Buffer(data, 'binary'));
-// 		});
-// 	});
-// });
+	poolCluster.getConnection('SLAVE*', function(err, client) {
+		client.query(get_file_hash, [req.body.thread_id], function(err, result) {
+			client.release();
+			res.json({hash: result});
+		});
+	});
+});
 
 module.exports = router;

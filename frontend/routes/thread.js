@@ -15,7 +15,6 @@ var client = new cassandra.Client(cassandra_config);
 
 var api = 'http://api.distributed-sharit.warloncs.net';
 
-// REQUIRES:
 // subdomain_name
 // thread_id
 // username
@@ -57,7 +56,6 @@ router.get('/NYU/:subdomain_name/:thread_id', function(req, res) {
     }
 });
 
-// REQUIRES:
 // subdomain_name
 router.get('/create_thread/NYU/:subdomain_name', function(req, res) {
 	if (req.session.data == null) {
@@ -66,13 +64,11 @@ router.get('/create_thread/NYU/:subdomain_name', function(req, res) {
 	res.render('create_thread', {subdomain_name: req.params.subdomain_name});
 });
 
-// REQUIRES:
 // subdomain_name
 // username
 // title
 // context
 // file
-// router.post('/create_thread/NYU/:subdomain_name', function(req, res) { // get back to this for file
 router.post('/create_thread/NYU/:subdomain_name', upload.single('file'), function(req, res) {
     console.log("req.body: ", req.body);
     console.log("req.params.subdomain_name: ", req.params.subdomain_name);
@@ -120,18 +116,21 @@ router.post('/create_thread/NYU/:subdomain_name', upload.single('file'), functio
 });
                     
 
-router.get('/downloadFile/:thread_id', function(req, res) { // get get back to thsi for file
-	var downloadFile = 'SELECT filename, data FROM file WHERE thread_id = ?';
-
-	pool.getConnection(function(err, client, done){
-		client.query(downloadFile, [req.params.thread_id], function(err, result){
-			client.release();
-			var filename = result[0].filename;
-    		var data = result[0].data;
-    		res.set('Content-disposition', 'attachment;filename=' + filename);
-    		res.send(new Buffer(data, 'binary'));
-		});
-	});
+router.get('/download_file/NYU/:thread_id', function(req, res) {
+    request.post({
+        url: api + '/download_file/NYU',
+        json: true,
+        form: {
+            thread_id: req.params.thread_id
+        }
+    }, function(error, response, body) {
+        var get_binary_data = 'SELECT filename, file_data FROM file WHERE hash = ?';
+        client.execute(get_binary_data, [response.body.hash], function(err, result) {
+            if (err) console.log(err);
+            res.set('Content-disposition', 'attachment;filename=' + result[0].filename);
+            res.send(new Buffer(result[0].data, 'binary'));
+        });
+    });
 });
 
 module.exports = router;
