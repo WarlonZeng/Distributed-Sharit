@@ -122,9 +122,9 @@ router.post('/download_file/NYU', function(req, res) {
 	var get_file_hash = 'SELECT hash FROM file WHERE thread_id = ?';
 
 	poolCluster.getConnection('SLAVE*', function(err, client) {
-		client.query(get_file_hash, [req.body.thread_id], function(err, result) {
+		client.query(get_file_hash, [req.body.thread_id], function(err, hash) {
 			client.release();
-			res.json({hash: result});
+			res.json(hash);
 		});
 	});
 });

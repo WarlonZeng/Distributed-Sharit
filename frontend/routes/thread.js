@@ -76,7 +76,7 @@ router.post('/create_thread/NYU/:subdomain_name', upload.single('file'), functio
 
     if (req.session.data != null) {
         if (req.file) {
-            var insert_file_into_database = 'INSERT INTO file (hash, filename, file_data) VALUES (?, ?, ?)';
+            var insert_file_into_database = 'INSERT INTO file (hash, filename, file_data) VALUES (?, ?, ?);';
             var hash = req.params.subdomain_name + '_' + req.session.data.username + '_' + req.file.originalname;
             client.execute(insert_file_into_database, [hash, req.file.originalname, req.file.buffer], function(err, result) {
                 if (err) console.log(err);
@@ -125,6 +125,7 @@ router.get('/download_file/NYU/:thread_id', function(req, res) {
         }
     }, function(error, response, body) {
         var get_binary_data = 'SELECT filename, file_data FROM file WHERE hash = ?';
+        console.log(response.body);
         client.execute(get_binary_data, [response.body.hash], function(err, result) {
             if (err) console.log(err);
             res.set('Content-disposition', 'attachment;filename=' + result[0].filename);
