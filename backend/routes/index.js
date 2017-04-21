@@ -28,7 +28,11 @@ router.get('/', function(req, res) { // General domains and subdomains
 			client.query(FIND_ALL_SUBDOMAINS, [], function(err, ALL_SUBDOMAINS) {
 				client.query(FIND_ALL_THREADS, [], function(err, ALL_THREADS) {
 					client.release();
-					res.json({ALL_DOMAINS, ALL_SUBDOMAINS, ALL_THREADS});
+					res.json({
+						ALL_DOMAINS, 
+						ALL_SUBDOMAINS, 
+						ALL_THREADS
+					});
 				});
 			});
 		});
@@ -45,7 +49,11 @@ router.get('/NYU', function(req, res) { // General domains and subdomains
 			client.query(FIND_ALL_SUBDOMAINS, [], function(err, ALL_SUBDOMAINS) {
 				client.query(FIND_ALL_THREADS, [], function(err, ALL_THREADS) {
 					client.release();
-					res.json({ALL_DOMAINS, ALL_SUBDOMAINS, ALL_THREADS});
+					res.json({
+						ALL_DOMAINS, 
+						ALL_SUBDOMAINS, 
+						ALL_THREADS
+					});
 				});
 			});
 		});
@@ -60,7 +68,10 @@ router.post('/', function(req, res) { // User specific domains and subdomains
 		client.query(find_user_subdomain_not_in, [req.body.username], function(err, user_subdomains_not_in) {
 			client.query(find_user_threads_in, [req.body.username], function(err, user_threads_in) {
 				client.release();
-				res.json({user_subdomains_not_in, user_threads_in}); 
+				res.json({
+					user_subdomains_not_in, 
+					user_threads_in
+				}); 
 			});
 		});
 	});
@@ -74,7 +85,10 @@ router.post('/NYU', function(req, res) { // User specific domains and subdomains
 		client.query(find_user_subdomain_not_in, [req.body.username], function(err, user_subdomains_not_in) {
 			client.query(find_user_threads_in, [req.body.username], function(err, user_threads_in) {
 				client.release();
-				res.json({user_subdomains_not_in, user_threads_in}); 
+				res.json({
+					user_subdomains_not_in, 
+					user_threads_in
+				}); 
 			});
 		});
 	});

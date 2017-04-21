@@ -33,9 +33,6 @@ router.get('/NYU/:subdomain_name', function(req, res) { // get all new fresh thr
 	    	json: true,
 	    	form: {username: req.session.data.username}
 		}, function(error, response, body) {
-
-			console.log(response.body.joined);
-
 			res.render('view_subdomain', {
 				nav: req.session.data.user_domains_in,
 				subnav: req.session.data.user_subdomains_in,

@@ -100,7 +100,8 @@ router.post('/create_thread/NYU/:subdomain_name', upload.single('file'), functio
                     res.redirect('/NYU/' + req.params.subdomain_name);
                 });
             });
-        } else {
+        } 
+        else {
             request.post({
                 url: api + '/create_thread/NYU',
                 json: true,
