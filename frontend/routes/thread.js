@@ -81,7 +81,7 @@ router.post('/create_thread/NYU/:subdomain_name', upload.single('file'), functio
     if (req.session.data != null) {
         if (req.file) {
             var insert_file_into_database = 'INSERT INTO file (timestamp, filename, file_data) VALUES (?, ?, ?)';
-            var timestamp = new Date().getTime().toString();
+            var timestamp = new Date().valueOf();
 
             client.execute(insert_file_into_database, [timestamp, req.file.originalname, req.file.buffer], function(err, result) {
                 if (err) console.log(err);
