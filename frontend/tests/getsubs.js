@@ -6,5 +6,6 @@ request.get({
     url: api + '/NYU/' + 'cooking',
     json: true
 }, function(error, response, body) {
-    console.log(response.body);
+	if (error) console.log(err);
+    // console.log(response.body);
 });

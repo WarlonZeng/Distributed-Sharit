@@ -30,7 +30,7 @@ router.get('/', function(req, res) { // General domains and subdomains
 	});
 });
 
-router.post('/', function(req, res) { // User specific domains and subdomains
+router.post('/NYU', function(req, res) { // User specific domains and subdomains
 	var find_user_subdomain_not_in = 'SELECT subdomain_name FROM subdomain WHERE subdomain_id NOT IN (SELECT subdomain_id FROM subdomain_user WHERE username = ?) ORDER BY subdomain_name';
 	var find_user_threads_in = 'SELECT * FROM subdomain_user NATURAL JOIN domain_user NATURAL JOIN thread NATURAL JOIN file NATURAL JOIN subdomain NATURAL JOIN domain WHERE username = ? ORDER BY thread_points DESC, date_posted DESC '
 	
