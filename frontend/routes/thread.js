@@ -125,11 +125,11 @@ router.get('/download_file/NYU/:thread_id', function(req, res) {
         }
     }, function(error, response, body) {
         var get_binary_data = 'SELECT filename, file_data FROM file WHERE hash = ?';
-        console.log(response.body);
         client.execute(get_binary_data, [response.body.hash], function(err, result) {
             if (err) console.log(err);
-            res.set('Content-disposition', 'attachment;filename=' + result[0].filename);
-            res.send(new Buffer(result[0].data, 'binary'));
+            console.log(response.body);
+            res.set('Content-disposition', 'attachment;filename=' + result.filename);
+            res.send(new Buffer(result.data, 'binary'));
         });
     });
 });
