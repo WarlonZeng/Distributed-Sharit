@@ -124,7 +124,7 @@ router.post('/download_file/NYU', function(req, res) {
 	poolCluster.getConnection('SLAVE*', function(err, client) {
 		client.query(get_file_hash, [req.body.thread_id], function(err, hash) {
 			client.release();
-			res.json(hash);
+			res.json(hash[0]);
 		});
 	});
 });
