@@ -39,7 +39,7 @@ var sessionOptions = {
 		expires: false,
 		secure: false
 	},
-	store: new redisStore({ host: '172.31.7.113', port: 6379, client: redisClient}),
+	store: new redisStore({ host: 'localhost', port: 6379, client: redisClient}),
 }
 
 app.use(session(sessionOptions));
