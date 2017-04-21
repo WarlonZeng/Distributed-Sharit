@@ -79,8 +79,8 @@ router.post('/vote_comment/NYU', function(req, res) {
 					});
 				}
 			}
-			else {
-				client.query(insert_user_rating_and_comment_points, [req.body.comment_id, req.body.username, req.body.rating, req.body.rating, req.body.comment_id], function(err, result) {
+			else { console.log('first time voting');
+				client.query(insert_user_rating_and_comment_points, [req.body.comment_id, req.body.username, req.body.rating, req.body.rating, req.body.comment_id], function(err, result) { if (err) console.log(err);
 					client.query(find_comment_points, [req.body.comment_id], function(err, result) {
 						res.json({points: result[0]});
 					});
