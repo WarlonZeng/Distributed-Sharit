@@ -44,7 +44,7 @@ router.get('/vote_comment/NYU/:comment_id/:rating', function(req, res) {
             json: true,
             form: {
             	username: req.session.data.username,
-            	thread_id: req.params.comment_id,
+            	comment_id: req.params.comment_id,
             	rating: req.params.rating
             }
         }, function(error, response, body) {
