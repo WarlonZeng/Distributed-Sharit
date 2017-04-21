@@ -4,10 +4,6 @@ var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var redis   = require("redis");
-var redisClient  = redis.createClient();
-var session = require('express-session');
-var redisStore = require('connect-redis')(session);
 
 var auth = require('./routes/auth');
 var index = require('./routes/index');
@@ -29,20 +25,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-var sessionOptions = {
-	secret: 'as89audacn123kjx24n238x',
-	saveUninitialized: false, 
-	resave: false,
-	cookie: {
-		httpOnly: false,
-		expires: false,
-		secure: false
-	},
-	store: new redisStore({ host: 'localhost', port: 6379, client: redisClient, ttl: 260}),
-}
-
-app.use(session(sessionOptions));
 
 app.use('/', auth);
 app.use('/', index);
