@@ -10,7 +10,7 @@ var api = 'http://api.distributed-sharit.warloncs.net';
 // rating
 router.get('/vote_thread/NYU/:thread_id/:rating', function(req, res) {
 	if (req.session.data == null) {
-		res.redirect('/login');
+		return res.redirect('/login');
 	}
 
 	else if (req.session.data != null) {
@@ -35,7 +35,7 @@ router.get('/vote_thread/NYU/:thread_id/:rating', function(req, res) {
 // rating
 router.get('/vote_comment/NYU/:comment_id/:rating', function(req, res) {
 	if (req.session.data == null) {
-		res.redirect('/login');
+		return res.redirect('/login');
 	}
 
 	else if (req.session.data != null) {
