@@ -82,7 +82,7 @@ router.get('/NYU', function(req, res) { // session: get user_domains, user_subdo
 	}
 });
 
-router.get('/ALL', function(req, res) { // session: get user_domains, user_subdomains, index: user_subdomains_not_in, user_threads
+router.get('/All', function(req, res) { // session: get user_domains, user_subdomains, index: user_subdomains_not_in, user_threads
 	if (req.session.data == null) {
 		request.get({
     		url: api + '/All',
