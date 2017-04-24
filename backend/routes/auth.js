@@ -34,10 +34,10 @@ router.post('/register', function(req, res) {
 	poolCluster.getConnection('MASTER', function(err, client) {
 
 		client.query(find_user, [req.body.username], function(err, result) {
-			console.log(err);
+			console.log(result);
 			if (err) 
 				console.log(err);
-			else if (result.length != 0) {
+			else if (result.length != 0 || result == null) {
 				console.log('inserting user into database');
 				client.query(insert_user_into_database, [req.body.username, salt, hash], function(err, result) {
 					if (err)
@@ -76,7 +76,7 @@ router.post('/login', function(req, res) { // get all domains and subdomains thi
 				console.log('Error running query', err);
 				res.json('error', {error: err});
 			}
-			if (result.length !== 0) {
+			if (result.length != 0 || result == null) {
 				var hash = bcrypt.hashSync(req.body.password, result[0].salt);
 
 				client.query(validLogin, [req.body.username, hash], function(err, result) {

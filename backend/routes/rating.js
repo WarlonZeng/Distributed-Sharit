@@ -26,7 +26,7 @@ router.post('/vote_thread/NYU', function(req, res) {
 	poolCluster.getConnection('MASTER', function(err, client) {
 		client.query(find_if_voted, [req.body.username, req.body.thread_id], function(err, result) {
 			console.log(result);
-			if (result.length != 0) {
+			if (result.length != 0 || result == null) {
 				if (result[0].rating == req.body.rating) { // person voted the same rating, dismiss
 					client.query(find_thread_points, [req.body.thread_id], function(err, result) {
 						res.json(result[0]);
@@ -65,7 +65,7 @@ router.post('/vote_comment/NYU', function(req, res) {
     poolCluster.getConnection('MASTER', function(err, client) {
         client.query(find_if_voted, [req.body.username, req.body.comment_id], function(err, result) {
             console.log(result);
-            if (result.length != 0) {
+            if (result.length != 0 || result == null) {
                 if (result[0].rating == req.body.rating) { // person voted the same rating, dismiss
                     client.query(find_comment_points, [req.body.comment_id], function(err, result) {
                         res.json(result[0]);
