@@ -36,6 +36,7 @@ router.post('/register', function(req, res) {
 		client.query(find_user, [req.body.username], function(err, result) {
 			if (err) 
 				console.log(err);
+			console.log(result);
 			else if (result.length != 0) {
 				console.log('inserting user into database');
 				client.query(insert_user_into_database, [req.body.username, salt, hash], function(err, result) {
@@ -91,13 +92,13 @@ router.post('/login', function(req, res) { // get all domains and subdomains thi
 					}
 					else {
 						client.release();
-						res.json({logged: false});
+						res.json({'Unsuccessful login'});
 					}
 				});
 			}
 			else {
 				client.release();
-				res.json({logged: false});
+				res.json({'Unsuccessful login'});
 			}
 		});
 	});

@@ -61,7 +61,8 @@ router.post('/login', function(req, res) {
     		username: req.body.username, 
     		password: req.body.password}
 	}, function(error, response, body) {
-		req.session.data = response.body; // user_domains and user_subdomains initialized and retrieved
+        if (response.body != 'Unsuccessful login')
+            req.session.data = response.body; // user_domains and user_subdomains initialized and retrieved
 		res.redirect("/");
 	});
 });
