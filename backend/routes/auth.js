@@ -34,9 +34,9 @@ router.post('/register', function(req, res) {
 	poolCluster.getConnection('MASTER', function(err, client) {
 
 		client.query(find_user, [req.body.username], function(err, result) {
+			console.log(err);
 			if (err) 
 				console.log(err);
-			console.log(result);
 			else if (result.length != 0) {
 				console.log('inserting user into database');
 				client.query(insert_user_into_database, [req.body.username, salt, hash], function(err, result) {
@@ -92,13 +92,13 @@ router.post('/login', function(req, res) { // get all domains and subdomains thi
 					}
 					else {
 						client.release();
-						res.json({'Unsuccessful login'});
+						res.json('Unsuccessful login');
 					}
 				});
 			}
 			else {
 				client.release();
-				res.json({'Unsuccessful login'});
+				res.json('Unsuccessful login');
 			}
 		});
 	});
