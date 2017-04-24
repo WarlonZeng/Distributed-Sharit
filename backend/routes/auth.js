@@ -37,6 +37,7 @@ router.post('/register', function(req, res) {
 			if (err) 
 				console.log(err);
 			else if (result.length != 0) {
+				console.log('inserting user into database');
 				client.query(insert_user_into_database, [req.body.username, salt, hash], function(err, result) {
 					if (err)
 						console.log(err);
@@ -47,11 +48,13 @@ router.post('/register', function(req, res) {
 							client.query(add_user_subdomains, [defaultSub[key], req.body.username, false]);
 						}
 						client.release();
+						console.log('Successful register');
 						res.json("OK");
 					});
 				});
 			}
 			else {
+				console.log('Unsuccessful register');
 				client.release();
 				res.json('Unsuccessful register');
 			}
