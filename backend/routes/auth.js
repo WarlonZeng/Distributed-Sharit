@@ -35,16 +35,28 @@ router.post('/register', function(req, res) {
 
 		client.query(find_user, [req.body.username], function(err, result) {
 			console.log(result);
-			if (err) 
+			if (err) {
 				console.log(err);
+				console.log('Unsuccessful register');
+				client.release();
+				return res.json('Unsuccessful register');
+			}
 			else if (result.length != 0 || result == null) {
 				console.log('inserting user into database');
 				client.query(insert_user_into_database, [req.body.username, salt, hash], function(err, result) {
-					if (err)
+					if (err) {
 						console.log(err);
+						console.log('Unsuccessful register');
+						client.release();
+						return res.json('Unsuccessful register');
+					}
 					client.query(add_user_domains, [1, req.body.username, false], function(err, result) {
-						if (err)
+						if (err) {
 							console.log(err);
+							console.log('Unsuccessful register');
+							client.release();
+							return res.json('Unsuccessful register');
+						}
 						for (var key in defaultSub) {
 							client.query(add_user_subdomains, [defaultSub[key], req.body.username, false]);
 						}
@@ -53,11 +65,6 @@ router.post('/register', function(req, res) {
 						res.json("OK");
 					});
 				});
-			}
-			else {
-				console.log('Unsuccessful register');
-				client.release();
-				res.json('Unsuccessful register');
 			}
 		});
 	});
