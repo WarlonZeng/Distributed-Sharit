@@ -24,7 +24,7 @@ router.get('/', function(req, res) { // session: get user_domains, user_subdomai
 				subnav: response.body.ALL_SUBDOMAINS, 
 				check_subdomains: response.body.ALL_SUBDOMAINS, 
 				threads: response.body.ALL_THREADS, 
-				logged: req.session.data.logged;
+				logged: req.session.data.logged
 			});
 		});
 	}
@@ -41,7 +41,7 @@ router.get('/', function(req, res) { // session: get user_domains, user_subdomai
 				subnav: req.session.data.user_subdomains_in, 
 				check_subdomains: response.body.user_subdomains_not_in, 
 				threads: response.body.user_threads_in, 
-				logged: req.session.data.logged;
+				logged: req.session.data.logged
 			});
 		});
 	}
