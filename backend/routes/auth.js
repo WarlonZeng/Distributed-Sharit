@@ -41,7 +41,7 @@ router.post('/register', function(req, res) {
 				client.release();
 				return res.json('Unsuccessful register');
 			}
-			else if (result.length != 0 || result == null) {
+			else if (result.length == 0 || result == null) { // if empty
 				console.log('inserting user into database');
 				client.query(insert_user_into_database, [req.body.username, salt, hash], function(err, result) {
 					if (err) {
@@ -65,6 +65,10 @@ router.post('/register', function(req, res) {
 						res.json("OK");
 					});
 				});
+			}
+			else {
+				client.release();
+				return res.json('Unsuccessful register');
 			}
 		});
 	});
