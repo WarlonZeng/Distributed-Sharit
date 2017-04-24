@@ -34,12 +34,15 @@ router.post('/register', function(req, res) {
 	poolCluster.getConnection('MASTER', function(err, client) {
 
 		client.query(find_user, [req.body.username], function(err, result) {
-			if (err) res.json(err);
-			if (result.length != 0) {
+			if (err) 
+				console.log(err);
+			else if (result.length != 0) {
 				client.query(insert_user_into_database, [req.body.username, salt, hash], function(err, result) {
-					if (err) res.json(err);
+					if (err)
+						console.log(err);
 					client.query(add_user_domains, [1, req.body.username, false], function(err, result) {
-						if (err) res.json(err);
+						if (err)
+							console.log(err);
 						for (var key in defaultSub) {
 							client.query(add_user_subdomains, [defaultSub[key], req.body.username, false]);
 						}
@@ -78,20 +81,20 @@ router.post('/login', function(req, res) { // get all domains and subdomains thi
 							client.query(find_user_subdomains_in, [req.body.username], function(err, user_subdomains_in) {
 								client.release();
 
-								var data = {username: req.body.username, user_domains_in, user_subdomains_in, sessionID: req.sessionID};
+								var data = {username: req.body.username, user_domains_in, user_subdomains_in, sessionID: req.sessionID, logged: true};
 								res.json(data);
 							});
 						});
 					}
 					else {
 						client.release();
-						res.json("Invalid username or password");
+						res.json({logged: false});
 					}
 				});
 			}
 			else {
 				client.release();
-				res.json("Invalid username or password");
+				res.json({logged: false});
 			}
 		});
 	});
