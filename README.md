@@ -1,5 +1,6 @@
 # Distributed Sharit
-Sharit Website still running @ http://sharit.warloncs.net 
+# WEBSITE IS SHUT DOWN
+Hosting the web app exceeded my AWS credits and actually costed me quite a fortune :(
 
 Website will get updated over the semester.
 
