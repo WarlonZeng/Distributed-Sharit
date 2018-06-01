@@ -1,7 +1,7 @@
 # Distributed Sharit
-Sharit Website still running @ http://sharit.warloncs.net 
+Website not running because I was dropping $100 per month on this project.
 
-Website will get updated over the semester.
+Website updated over the semester.
 
 * Google drive Link
  * https://drive.google.com/open?id=0B8SEHfpAjaYCYXlfWkdCUWZxZGc
